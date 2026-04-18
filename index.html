@@ -997,9 +997,9 @@
   setInterval(updateCountdown,1000); updateCountdown();
   
   // Map (Pendopo Uti, Bekasi)
-  const map=L.map('map').setView([-6.833992, 107.919447],15);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
-  L.marker([-6.833992, 107.919447]).addTo(map).bindPopup('📍 Jl. Angkrek Situ No.34, RT.003/RW.009, Situ, Kec. Sumedang Utara, Kabupaten Sumedang, Jawa Barat 53738').openPopup();
+  // const map=L.map('map').setView([-6.833992, 107.919447],15);
+  // L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+  // L.marker([-6.833992, 107.919447]).addTo(map).bindPopup('📍 Jl. Angkrek Situ No.34, RT.003/RW.009, Situ, Kec. Sumedang Utara, Kabupaten Sumedang, Jawa Barat 53738').openPopup();
   
   // RSVP
 //   document.getElementById('rsvpForm').addEventListener('submit',(e)=>{
@@ -1139,8 +1139,8 @@
         jumlahTamuGroup.style.display = 'none';
         
       } catch (error) {
-        console.error('Error detail:', error);
-        showMessage('❌ Maaf, terjadi kesalahan. Silakan coba lagi.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Kirim Konfirmasi Kehadiran';
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = 'Kirim Konfirmasi Kehadiran';
