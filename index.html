@@ -426,7 +426,7 @@
         <h3 class="script" style="font-size:2rem">Annastasya Ria Dewi</h3>
         <p>Putri kedua dari (alm) Bapak  & Ibu Eulis Hayati</p>
         <div style="height:1px; background:#cfe9ff; width:50px; margin:20px auto"></div>
-        <h3 class="script" style="font-size:2rem">Rahman Subrata</h3>
+        <h3 class="script" style="font-size:2rem">Adi Junaidi</h3>
         <p>Putra kedua dari Bapak Tata & Ibu Nining Suharningsih</p>
       </div>
     </div>
@@ -536,6 +536,26 @@
         <div id="message" class="message"></div>
 
       <div id="rsvpMessage" style="text-align:center; margin-top:15px"></div>
+    </div>
+  </section>
+
+  <section>
+     <div class="container">
+        <div class="container">
+            <div class="header">
+                <h1>💝 Daftar Konfirmasi Kehadiran 💝</h1>
+                <p>Annastasya & Rahman</p>
+            </div>
+
+            <div id="content">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Memuat data konfirmasi...</p>
+                </div>
+            </div>
+
+            <div class="last-update" id="lastUpdate"></div>
+        </div>
     </div>
   </section>
 
@@ -704,7 +724,7 @@
       // Kirim POST request ke Google Forms
       const response = await fetch(GOOGLE_FORM_URL, {
         method: 'POST',
-        mode: 'no-cors',
+        // mode: 'no-cors',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -761,6 +781,282 @@
         submitBtn.innerHTML = 'Kirim Konfirmasi Kehadiran';
       }
     });
+   
+    // show form
+     const CSV_URL = 'https://docs.google.com/spreadsheets/d/1FTUfyf_K4PIwIdV6RQ7-bP8OURLWQNZ146Cux1SfyAg/edit?usp=sharing';
+      const SPREADSHEET_ID = '1FTUfyf_K4PIwIdV6RQ7-bP8OURLWQNZ146Cux1SfyAg';  // GANTI INI
+        
+        // Nama sheet (biasanya "Form Responses 1" atau "Sheet1")
+        const SHEET_NAME = 'Form Responses 1';  // GANTI jika perlu
+        
+        // ============================================================
+        // KONFIGURASI
+        // ============================================================
+        const ITEMS_PER_PAGE = 9;
+        
+        let allData = [];
+        let currentFilter = 'semua';
+        let currentSearch = '';
+        let currentPage = 1;
+        
+        // ============================================================
+        // FUNGSI: Fetch data menggunakan Google Sheets API v4
+        // ============================================================
+        async function fetchRSVPData() {
+            // Menggunakan Google Sheets API publik (read-only)
+            // Data diambil dalam format JSON
+            const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const text = await response.text();
+                
+                // Parse JSONP response (Google returns data in a special format)
+                // Format: google.visualization.Query.setResponse({...})
+                const jsonStart = text.indexOf('{');
+                const jsonEnd = text.lastIndexOf('}');
+                const jsonStr = text.substring(jsonStart, jsonEnd + 1);
+                const jsonData = JSON.parse(jsonStr);
+                
+                // Parse tabel data
+                const table = jsonData.table;
+                const rows = table.rows;
+                const cols = table.cols;
+                
+                // Ambil nama kolom
+                const headers = cols.map(col => col.label);
+                
+                // Mapping header (sesuaikan dengan form Anda)
+                let namaIndex = -1;
+                let kehadiranIndex = -1;
+                let jumlahTamuIndex = -1;
+                let ucapanIndex = -1;
+                let timestampIndex = -1;
+                
+                headers.forEach((header, index) => {
+                    const lowerHeader = (header || '').toLowerCase();
+                    if (lowerHeader.includes('nama')) namaIndex = index;
+                    else if (lowerHeader.includes('hadir') || lowerHeader.includes('kehadiran')) kehadiranIndex = index;
+                    else if (lowerHeader.includes('jumlah') || lowerHeader.includes('tamu')) jumlahTamuIndex = index;
+                    else if (lowerHeader.includes('ucapan') || lowerHeader.includes('doa')) ucapanIndex = index;
+                    else if (lowerHeader.includes('stempel') || lowerHeader.includes('timestamp')) timestampIndex = index;
+                });
+                
+                // Parse setiap baris
+                const result = [];
+                for (let i = 0; i < rows.length; i++) {
+                    const rowCells = rows[i].c || [];
+                    
+                    const item = {
+                        timestamp: timestampIndex >= 0 && rowCells[timestampIndex] ? rowCells[timestampIndex].v : '',
+                        nama: namaIndex >= 0 && rowCells[namaIndex] ? rowCells[namaIndex].v : 'Tidak diketahui',
+                        kehadiran: kehadiranIndex >= 0 && rowCells[kehadiranIndex] ? rowCells[kehadiranIndex].v : '',
+                        jumlah_tamu: jumlahTamuIndex >= 0 && rowCells[jumlahTamuIndex] ? rowCells[jumlahTamuIndex].v : '',
+                        ucapan: ucapanIndex >= 0 && rowCells[ucapanIndex] ? rowCells[ucapanIndex].v : ''
+                    };
+                    
+                    // Tentukan status kehadiran
+                    const kehadiran = (item.kehadiran || '').toLowerCase();
+                    if (kehadiran.includes('ya') || kehadiran.includes('hadir')) {
+                        item.status = 'hadir';
+                    } else if (kehadiran.includes('tidak')) {
+                        item.status = 'tidak';
+                    } else {
+                        item.status = 'unknown';
+                    }
+                    
+                    result.push(item);
+                }
+                
+                // Update waktu terakhir
+                document.getElementById('lastUpdate').innerHTML = `🔄 Terakhir diperbarui: ${new Date().toLocaleString('id-ID')}`;
+                
+                return result;
+                
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                throw error;
+            }
+        }
+        
+        // ============================================================
+        // FILTER & SEARCH
+        // ============================================================
+        function filterAndSearchData() {
+            let filtered = [...allData];
+            
+            if (currentFilter !== 'semua') {
+                filtered = filtered.filter(item => item.status === currentFilter);
+            }
+            
+            if (currentSearch.trim() !== '') {
+                const searchLower = currentSearch.toLowerCase();
+                filtered = filtered.filter(item => 
+                    (item.nama || '').toLowerCase().includes(searchLower)
+                );
+            }
+            
+            return filtered;
+        }
+        
+        // ============================================================
+        // RENDER FUNCTIONS
+        // ============================================================
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function renderCards(data) {
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const pageData = data.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+            
+            if (pageData.length === 0) {
+                return `<div class="empty-state">😊 Belum ada konfirmasi yang sesuai.</div>`;
+            }
+            
+            return `
+                <div class="card-grid">
+                    ${pageData.map(item => `
+                        <div class="rsvp-card">
+                            <div class="card-name">
+                                ${escapeHtml(item.nama)}
+                                <span class="status-badge ${item.status === 'hadir' ? 'status-hadir' : 'status-tidak'}">
+                                    ${item.status === 'hadir' ? '✅ Hadir' : '❌ Tidak Hadir'}
+                                </span>
+                            </div>
+                            ${item.jumlah_tamu && item.status === 'hadir' ? `
+                                <div class="card-info">
+                                    📋 ${escapeHtml(item.jumlah_tamu)} Tamu
+                                </div>
+                            ` : ''}
+                            ${item.ucapan ? `
+                                <div class="card-message">
+                                    💬 "${escapeHtml(item.ucapan)}"
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        function renderPagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+            if (totalPages <= 1) return '';
+            
+            let html = '<div class="pagination">';
+            html += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>`;
+            
+            for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+            
+            if (totalPages > 5) {
+                html += `<span style="padding: 8px;">...</span>`;
+                html += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+            
+            html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
+            html += '</div>';
+            return html;
+        }
+        
+        async function renderFullPage() {
+            const container = document.getElementById('content');
+            
+            container.innerHTML = `<div class="loading"><div class="spinner"></div><p>Memuat data...</p></div>`;
+            
+            try {
+                allData = await fetchRSVPData();
+                
+                const filteredData = filterAndSearchData();
+                const totalHadir = allData.filter(d => d.status === 'hadir').length;
+                const totalTidak = allData.filter(d => d.status === 'tidak').length;
+                const total = allData.length;
+                
+                if (currentPage > Math.ceil(filteredData.length / ITEMS_PER_PAGE) && filteredData.length > 0) {
+                    currentPage = 1;
+                }
+                
+                const html = `
+                    <div class="stats">
+                        <div class="stat-card"><div class="stat-number">${total}</div><div class="stat-label">Total Konfirmasi</div></div>
+                        <div class="stat-card"><div class="stat-number" style="color:#28a745;">${totalHadir}</div><div class="stat-label">✅ Akan Hadir</div></div>
+                        <div class="stat-card"><div class="stat-number" style="color:#dc3545;">${totalTidak}</div><div class="stat-label">❌ Tidak Hadir</div></div>
+                    </div>
+                    <div class="filter-section">
+                        <h3>Filter Kehadiran</h3>
+                        <div class="filter-buttons">
+                            <button class="filter-btn ${currentFilter === 'semua' ? 'active' : ''}" onclick="setFilter('semua')">Semua</button>
+                            <button class="filter-btn ${currentFilter === 'hadir' ? 'active' : ''}" onclick="setFilter('hadir')">✅ Akan Hadir</button>
+                            <button class="filter-btn ${currentFilter === 'tidak' ? 'active' : ''}" onclick="setFilter('tidak')">❌ Tidak Hadir</button>
+                        </div>
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="🔍 Cari nama tamu..." value="${escapeHtml(currentSearch)}" onkeyup="handleSearch(event)">
+                        </div>
+                    </div>
+                    ${renderCards(filteredData)}
+                    ${renderPagination(filteredData.length)}
+                `;
+                
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Render error:', error);
+                container.innerHTML = `
+                    <div class="error">
+                        <strong>⚠️ Gagal memuat data</strong><br>
+                        Pastikan SPREADSHEET_ID dan SHEET_NAME sudah benar.<br>
+                        <small>Error: ${error.message}</small>
+                        <br><br>
+                        <strong>📌 Cara mendapatkan SPREADSHEET_ID:</strong><br>
+                        1. Buka Google Sheets respons Anda<br>
+                        2. Lihat URL: docs.google.com/spreadsheets/d/<b>SPREADSHEET_ID</b>/edit<br>
+                        3. Copy ID tersebut dan ganti di kode
+                    </div>
+                `;
+            }
+        }
+        
+        // ============================================================
+        // EVENT HANDLERS
+        // ============================================================
+        window.setFilter = function(filter) {
+            currentFilter = filter;
+            currentPage = 1;
+            renderFullPage();
+        };
+        
+        window.handleSearch = function(event) {
+            currentSearch = event.target.value;
+            currentPage = 1;
+            renderFullPage();
+        };
+        
+        window.changePage = function(page) {
+            const filteredData = filterAndSearchData();
+            const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderFullPage();
+            }
+        };
+        
+        // Auto refresh setiap 30 detik
+        setInterval(() => {
+            if (document.hidden) return;
+            renderFullPage();
+        }, 30000);
+        
+        // Start
+        renderFullPage();
    
 </script>
 </body>
