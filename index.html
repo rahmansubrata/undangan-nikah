@@ -501,7 +501,8 @@
 </div>
 
 <audio id="bgMusic" loop>
-   <source src="Stephen-song.mp3" type="audio/mpeg">
+   <!-- <source src="Stephen-song.mp3" type="audio/mpeg"> -->
+  <source src="Blue.mp3" type="audio/mpeg">
   <!-- <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg"> -->
 </audio>
 <div class="music-player">
@@ -708,22 +709,43 @@
   })();
 
   // Musik
-  const bgAudio = document.getElementById('bgMusic');
-  const toggle = document.getElementById('musicToggleBtn');
-  const eqSpans = document.querySelectorAll('#equalizerVis span');
-  let playing = false;
-  function startMusic() { bgAudio.play().then(()=>{ playing=true; toggle.innerHTML='<i class="fas fa-music"></i>'; }).catch(e=>console.log); }
-  toggle.onclick=()=>{ if(playing){ bgAudio.pause(); playing=false; toggle.innerHTML='<i class="fas fa-volume-mute"></i>'; }else{ bgAudio.play().then(()=>{ playing=true; toggle.innerHTML='<i class="fas fa-music"></i>'; }); } };
-  document.body.addEventListener('touchstart',startMusic,{once:true});
-  document.body.addEventListener('click',startMusic,{once:true});
-  
-  // Our Song
-  const songBtn = document.getElementById('playSongBtn');
-  let songAudio=null, songActive=false;
-  songBtn.onclick=()=>{
-    if(songActive && songAudio){ songAudio.pause(); songActive=false; songBtn.innerHTML='<i class="fas fa-play"></i> Putar Lagu Spesial'; }
-    else{ if(songAudio) songAudio.pause(); songAudio=new Audio('Stephen-song.mp3" type="audio/mpeg'); songAudio.play(); songActive=true; songBtn.innerHTML='<i class="fas fa-heart"></i> Sedang Diputar'; songAudio.onended=()=>{ songActive=false; songBtn.innerHTML='<i class="fas fa-play"></i> Putar Lagu Spesial'; }; }
-  };
+ // ============================================================
+    // 2. AUTOPLAY MUSIK (AKTIF SETELAH INTERAKSI)
+    // ============================================================
+    const bgAudio = document.getElementById('bgMusic');
+    const toggleBtn = document.getElementById('musicToggleBtn');
+    const eqSpans = document.querySelectorAll('#equalizerVis span');
+    const autoplayHint = document.getElementById('autoplayHint');
+    let musicPlaying = false;
+    let musicStarted = false;
+    
+    function animateEqualizer(active) {
+        eqSpans.forEach(span => span.style.animationPlayState = active ? 'running' : 'paused');
+    }
+    
+    function startBackgroundMusic() {
+        if (musicStarted) return;
+        
+        bgAudio.play().then(() => {
+            musicPlaying = true;
+            musicStarted = true;
+            toggleBtn.innerHTML = '<i class="fas fa-music"></i>';
+            animateEqualizer(true);
+            
+            // Sembunyikan hint setelah musik dimulai
+            if (autoplayHint) {
+                autoplayHint.style.opacity = '0';
+                setTimeout(() => autoplayHint.style.display = 'none', 1000);
+            }
+        }).catch(e => {
+            console.log("Autoplay masih perlu interaksi:", e);
+            // Tampilkan hint lebih jelas
+            if (autoplayHint) {
+                autoplayHint.innerHTML = '🎵 Klik tombol musik di kanan bawah untuk memutar lagu 🎵';
+                autoplayHint.style.background = '#667eea';
+            }
+        });
+    }
   
   // Countdown ke 12 April 2026
   function updateCountdown(){
