@@ -501,7 +501,8 @@
 </div>
 
 <audio id="bgMusic" loop>
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+   <source src="Stephen-song.mp3" type="audio/mpeg">
+  <!-- <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg"> -->
 </audio>
 <div class="music-player">
   <div class="equalizer"><span></span><span></span><span></span><span></span></div>
@@ -721,7 +722,7 @@
   let songAudio=null, songActive=false;
   songBtn.onclick=()=>{
     if(songActive && songAudio){ songAudio.pause(); songActive=false; songBtn.innerHTML='<i class="fas fa-play"></i> Putar Lagu Spesial'; }
-    else{ if(songAudio) songAudio.pause(); songAudio=new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'); songAudio.play(); songActive=true; songBtn.innerHTML='<i class="fas fa-heart"></i> Sedang Diputar'; songAudio.onended=()=>{ songActive=false; songBtn.innerHTML='<i class="fas fa-play"></i> Putar Lagu Spesial'; }; }
+    else{ if(songAudio) songAudio.pause(); songAudio=new Audio('Stephen-song.mp3" type="audio/mpeg'); songAudio.play(); songActive=true; songBtn.innerHTML='<i class="fas fa-heart"></i> Sedang Diputar'; songAudio.onended=()=>{ songActive=false; songBtn.innerHTML='<i class="fas fa-play"></i> Putar Lagu Spesial'; }; }
   };
   
   // Countdown ke 12 April 2026
