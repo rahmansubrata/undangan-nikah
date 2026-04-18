@@ -1,531 +1,268 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Pernikahan Annastasya & Rahman | Undangan Digital</title>
-  <!-- Google Fonts: Elegant & Script -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Parisienne&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <!-- Font Awesome 6 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #f0f9ff;
-      overflow-x: hidden;
-      scroll-behavior: smooth;
-    }
-    /* Loading Screen */
-    .loading-screen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #cfe9ff, #b8dcff);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      transition: opacity 0.8s ease;
-    }
-    .loading-screen .ring {
-      width: 70px;
-      height: 70px;
-      border: 4px solid rgba(255,255,245,0.5);
-      border-top: 4px solid #7cb9e8;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-bottom: 25px;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .loading-screen p {
-      font-family: 'Parisienne', cursive;
-      font-size: 1.8rem;
-      color: #2c5a7a;
-    }
-    .loading-screen.hide {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-    /* Music Player */
-    .music-player {
-      position: fixed;
-      bottom: 25px;
-      right: 20px;
-      background: rgba(255,255,250,0.95);
-      backdrop-filter: blur(8px);
-      border-radius: 60px;
-      padding: 12px 18px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-      z-index: 1000;
-      border: 1px solid rgba(124,185,232,0.6);
-    }
-    .equalizer {
-      display: flex;
-      gap: 3px;
-      align-items: center;
-      height: 25px;
-    }
-    .equalizer span {
-      width: 3px;
-      height: 8px;
-      background: #7cb9e8;
-      border-radius: 2px;
-      animation: soundWave 0.9s infinite ease alternate;
-    }
-    .equalizer span:nth-child(2) { animation-delay: 0.2s; height: 12px; }
-    .equalizer span:nth-child(3) { animation-delay: 0.4s; height: 18px; }
-    .equalizer span:nth-child(4) { animation-delay: 0.6s; height: 10px; }
-    @keyframes soundWave {
-      0% { height: 5px; opacity: 0.5; }
-      100% { height: 18px; opacity: 1; }
-    }
-    .music-toggle {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      color: #3f7ea3;
-      cursor: pointer;
-    }
-    /* Utility */
-    section {
-      padding: 70px 24px;
-      position: relative;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    h1, h2, h3 {
-      font-family: 'Playfair Display', serif;
-      font-weight: 600;
-    }
-    .script {
-      font-family: 'Parisienne', cursive;
-      font-weight: normal;
-    }
-    .btn-sky {
-      background: linear-gradient(135deg, #cbe5fe, #aac9ef);
-      border: none;
-      padding: 12px 32px;
-      border-radius: 50px;
-      font-weight: 500;
-      color: #1e4a6e;
-      box-shadow: 0 5px 15px rgba(100, 160, 210, 0.3);
-      transition: all 0.3s;
-      cursor: pointer;
-    }
-    .fade-up {
-      opacity: 0;
-      transform: translateY(25px);
-      transition: all 0.9s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-    }
-    .fade-up.appear {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    /* Hero */
-    .hero {
-      min-height: 100vh;
-      background: linear-gradient(125deg, rgba(200,230,255,0.85), rgba(170,215,245,0.9)), url('https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') center/cover;
-      display: flex;
-      align-items: center;
-      text-align: center;
-    }
-    .hero-content {
-      background: rgba(255,255,250,0.75);
-      backdrop-filter: blur(5px);
-      padding: 40px 20px;
-      border-radius: 60px 20px 60px 20px;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-    .hero .script-name {
-      font-size: 3.5rem;
-      color: #2c6c9e;
-    }
-    .countdown {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-top: 30px;
-    }
-    .time-box {
-      background: rgba(255,255,245,0.95);
-      padding: 12px 0;
-      width: 80px;
-      border-radius: 20px;
-    }
-    .time-num {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #5588b1;
-    }
-    /* Parents & Prayer */
-    .parents-info, .prayer-card {
-      background: white;
-      border-radius: 40px;
-      padding: 30px;
-      margin-top: 30px;
-      text-align: center;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.05);
-    }
-    .arabic {
-      font-size: 1.8rem;
-      font-family: 'Amiri', serif;
-      line-height: 1.6;
-    }
-    /* Timeline */
-    .timeline {
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-      margin-top: 40px;
-    }
-    .timeline-item {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-      background: #ffffffdb;
-      border-radius: 40px;
-      padding: 18px;
-    }
-    .timeline-icon {
-      font-size: 2rem;
-      min-width: 60px;
-      background: #d9efff;
-      border-radius: 100px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    /* Map & Gift */
-    #map {
-      height: 280px;
-      border-radius: 30px;
-      margin-top: 20px;
-    }
-    .gift-box {
-      background: rgba(235, 247, 255, 0.8);
-      border-radius: 60px;
-      padding: 30px;
-      text-align: center;
-    }
-    .vendor-list {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin: 20px 0;
-    }
-    footer {
-      text-align: center;
-      padding: 30px 20px;
-      font-size: 0.8rem;
-      color: #3f6d8c;
-    }
-    @media (max-width: 650px) {
-      .hero .script-name { font-size: 2.5rem; }
-      .timeline-item { flex-direction: column; text-align: center; }
-    }
-    /* tambahan */
-    /* {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-     */
-    /* body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    } */
-    .container {
-      background: white;
-      border-radius: 20px;
-      padding: 40px;
-      max-width: 500px;
-      width: 100%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-    h1 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 10px;
-    }
-    .subtitle {
-      text-align: center;
-      color: #666;
-      margin-bottom: 30px;
-      font-style: italic;
-    }
-    .form-group {
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #555;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 10px;
-      font-size: 16px;
-      transition: border-color 0.3s;
-    }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-    .radio-group {
-      display: flex;
-      gap: 20px;
-      margin-top: 8px;
-      flex-wrap: wrap;
-    }
-    .radio-option {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-    }
-    .radio-option input[type="radio"] {
-      width: 18px;
-      height: 18px;
-      margin: 0;
-      cursor: pointer;
-    }
-    .radio-option label {
-      margin: 0;
-      cursor: pointer;
-      font-weight: normal;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    button:hover {
-      transform: translateY(-2px);
-    }
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    .message {
-      margin-top: 20px;
-      padding: 12px;
-      border-radius: 10px;
-      text-align: center;
-      display: none;
-    }
-    .message.success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-      display: block;
-    }
-    .message.error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-      display: block;
-    }
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 0.8s linear infinite;
-      margin-right: 8px;
-      vertical-align: middle;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .required {
-      color: red;
-    }
-    .note {
-      font-size: 12px;
-      color: #888;
-      margin-top: 5px;
-    }
-    /* css view */
-     .stat-card { text-align: center; flex: 1; min-width: 120px; }
-        .stat-number { font-size: 2rem; font-weight: bold; color: #667eea; }
-        .stat-label { color: #666; margin-top: 5px; }
-        .filter-section {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 30px;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Undangan Pernikahan | Annastasya & Rahman</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Parisienne&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .filter-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
-        .filter-btn {
-            padding: 8px 20px;
-            border: 2px solid #667eea;
-            background: white;
-            color: #667eea;
-            border-radius: 30px;
-            cursor: pointer;
-        }
-        .filter-btn.active { background: #667eea; color: white; }
-        .search-box input {
-            width: 100%;
-            padding: 12px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 30px;
-            font-size: 16px;
-        }
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-        }
-        .rsvp-card {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-        .rsvp-card:hover { transform: translateY(-5px); }
-        .card-name {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: bold;
-        }
-        .status-hadir { background: #d4edda; color: #155724; }
-        .status-tidak { background: #f8d7da; color: #721c24; }
-        .card-message {
-            margin-top: 15px;
-            padding: 12px;
-            background: #f9f9f9;
-            border-radius: 12px;
-            font-style: italic;
-            color: #555;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 50px;
-            background: white;
-            border-radius: 20px;
-            color: #888;
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-        .page-btn {
-            padding: 8px 15px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .page-btn.active { background: #667eea; color: white; border-color: #667eea; }
-        .loading, .error {
-            text-align: center;
-            padding: 50px;
-            background: white;
-            border-radius: 20px;
-        }
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .error { background: #f8d7da; color: #721c24; }
-        .last-update { text-align: center; margin-top: 30px; color: rgba(255,255,255,0.7); font-size: 0.8rem; }
-        @media (max-width: 768px) { .card-grid { grid-template-columns: 1fr; } }
-
-        /* Music Error Message */
-        .music-error {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #ff6b6b;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 12px;
-            z-index: 1001;
-            display: none;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f0f9ff;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
         }
         
-        @media (max-width: 650px) {
-            .hero .script-name { font-size: 2.5rem; }
-            .time-box { width: 65px; }
-            .timeline-item { flex-direction: column; text-align: center; }
-            .autoplay-hint { font-size: 11px; padding: 8px 15px; bottom: 90px; }
-        }
-         /* Heart Particles on Click */
-        .heart-particle {
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #e0f0ff; }
+        ::-webkit-scrollbar-thumb { background: #7cb9e8; border-radius: 10px; }
+
+        /* ============================================ */
+        /* SPLASH SCREEN / LOADING SCREEN (HALAMAN AWAL) */
+        /* ============================================ */
+        .splash-screen {
             position: fixed;
-            pointer-events: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #cfe9ff, #b8dcff);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        .splash-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        /* Dekorasi bunga di splash screen */
+        .splash-flower {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        .splash-flower-1 { top: 10%; left: 5%; transform: rotate(-15deg); animation: floatFlower 8s ease-in-out infinite; }
+        .splash-flower-2 { bottom: 15%; right: 8%; transform: rotate(10deg); animation: floatFlower 10s ease-in-out infinite reverse; }
+        .splash-flower-3 { top: 20%; right: 15%; transform: rotate(25deg); animation: floatFlower 7s ease-in-out infinite; }
+        .splash-flower-4 { bottom: 25%; left: 10%; transform: rotate(-5deg); animation: floatFlower 9s ease-in-out infinite; }
+        .splash-flower-5 { top: 50%; left: 20%; transform: rotate(45deg); animation: floatFlower 12s ease-in-out infinite; }
+        .splash-flower-6 { bottom: 40%; right: 20%; transform: rotate(-30deg); animation: floatFlower 11s ease-in-out infinite; }
+        
+        @keyframes floatFlower {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+        
+        .splash-content {
+            text-align: center;
+            z-index: 2;
+            padding: 40px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 80px;
+            margin: 20px;
+            animation: fadeInScale 0.8s ease-out;
+        }
+        
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .splash-greeting {
+            font-family: 'Parisienne', cursive;
+            font-size: 1.4rem;
+            color: #2c5a7a;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+        
+        .splash-name {
+            font-family: 'Parisienne', cursive;
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #2c6c9e, #6ea8d9, #c2a575);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+        }
+        
+        .splash-guest {
+            font-size: 1.5rem;
+            color: #1e4a6e;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .splash-guest span {
+            font-weight: bold;
+            color: #c2a575;
+            background: rgba(255,255,255,0.5);
+            padding: 5px 15px;
+            border-radius: 40px;
+            display: inline-block;
+        }
+        
+        .splash-date {
+            font-size: 1rem;
+            color: #3f7ea3;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+        
+        .ring-animation {
+            width: 70px;
+            height: 70px;
+            border: 4px solid rgba(255,255,245,0.5);
+            border-top: 4px solid #7cb9e8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+        }
+        
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .btn-enter {
+            background: linear-gradient(135deg, #2c6c9e, #1e4a6e);
+            border: none;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .btn-enter:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+            background: linear-gradient(135deg, #3a7ca8, #2a5a7e);
+        }
+        
+        .btn-enter i {
             font-size: 1.2rem;
-            animation: floatHeart 1s ease-out forwards;
         }
-        @keyframes floatHeart {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
+        
+        /* Music Player */
+        .music-player {
+            position: fixed;
+            bottom: 25px;
+            right: 20px;
+            background: rgba(255,255,250,0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 60px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            z-index: 1000;
+            border: 1px solid rgba(124,185,232,0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-       
+        .music-player:hover { transform: scale(1.05); }
+        .equalizer { display: flex; gap: 3px; align-items: center; height: 25px; }
+        .equalizer span {
+            width: 3px;
+            height: 8px;
+            background: #7cb9e8;
+            border-radius: 2px;
+            animation: soundWave 0.9s infinite ease alternate;
+        }
+        .equalizer span:nth-child(2) { animation-delay: 0.2s; height: 12px; }
+        .equalizer span:nth-child(3) { animation-delay: 0.4s; height: 18px; }
+        .equalizer span:nth-child(4) { animation-delay: 0.6s; height: 10px; }
+        @keyframes soundWave {
+            0% { height: 5px; opacity: 0.5; }
+            100% { height: 18px; opacity: 1; }
+        }
+        .music-toggle { background: none; border: none; font-size: 1.5rem; color: #3f7ea3; cursor: pointer; }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(125deg, rgba(200,230,255,0.7), rgba(170,215,245,0.8)), url('https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover;
+            background-size: 110%;
+            animation: slowZoom 20s ease-in-out infinite alternate;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        @keyframes slowZoom {
+            0% { background-size: 100%; background-position: center; }
+            100% { background-size: 120%; background-position: 30% 20%; }
+        }
+        .hero-content {
+            background: rgba(255,255,250,0.75);
+            backdrop-filter: blur(5px);
+            padding: 40px 20px;
+            border-radius: 60px 20px 60px 20px;
+            max-width: 700px;
+            margin: 0 auto;
+            z-index: 2;
+        }
+        .hero .script-name {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #2c6c9e, #6ea8d9, #c2a575);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientShift 5s ease infinite;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .hero-greeting { font-size: 1.2rem; margin-bottom: 20px; }
+        .date { font-size: 1.2rem; letter-spacing: 2px; margin: 15px 0; color: #1f5277; }
+        .countdown { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 30px; }
+        .time-box {
+            background: rgba(255,255,245,0.95);
+            padding: 12px 0;
+            width: 80px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        .time-num { font-size: 2rem; font-weight: 700; color: #5588b1; }
+
+        /* Sections */
+        section {
+            padding: 70px 24px;
+            position: relative;
+            clear: both;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow: visible;
+        }
+        
         /* Google Maps Container */
         .map-container {
             width: 100%;
@@ -565,155 +302,640 @@
             box-shadow: 0 10px 25px rgba(66,133,244,0.3);
         }
         
-  </style>
+        /* Gallery */
+        .gallery-section {
+            margin-top: 20px;
+            clear: both;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+            clear: both;
+        }
+        .gallery-grid img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 30px;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+        .gallery-grid img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        /* Timeline & Cards */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background: #ffffffdb;
+            border-radius: 40px;
+            padding: 18px;
+            border: 1px solid rgba(124,185,232,0.2);
+            backdrop-filter: blur(4px);
+        }
+        .timeline-icon {
+            font-size: 2rem;
+            min-width: 60px;
+            background: #d9efff;
+            border-radius: 100px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .details-card {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        .card {
+            background: white;
+            border-radius: 40px;
+            padding: 25px;
+            flex: 1;
+            min-width: 240px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+        }
+        
+        /* Our Song */
+        .our-song {
+            background: linear-gradient(120deg, #e4f0fe, #d4e9fc);
+            border-radius: 60px;
+            padding: 40px 25px;
+            text-align: center;
+        }
+        .song-bar {
+            width: 6px;
+            height: 40px;
+            background: #6ea8d9;
+            border-radius: 10px;
+            animation: wave 1s infinite ease alternate;
+            display: inline-block;
+            margin: 0 3px;
+        }
+        @keyframes wave {
+            0% { height: 15px; }
+            100% { height: 45px; }
+        }
+        
+        /* RSVP */
+        .rsvp-form input, .rsvp-form select, .rsvp-form textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #bddcf5;
+            border-radius: 50px;
+            background: #ffffff;
+            font-family: inherit;
+        }
+        .btn-sky {
+            background: linear-gradient(135deg, #cbe5fe, #aac9ef);
+            border: none;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: 500;
+            color: #1e4a6e;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-sky:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(100,160,210,0.4);
+        }
+        
+        /* Gift */
+        .gift-box {
+            background: rgba(235, 247, 255, 0.8);
+            border-radius: 60px;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 0.9rem;
+            color: #3f6d8c;
+            clear: both;
+        }
+        
+        /* Floating Petals */
+        .floating-petal {
+            position: fixed;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.5;
+            animation: floatRandom 10s linear infinite;
+        }
+        @keyframes floatRandom {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+        
+        /* Heart Particles */
+        .heart-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 1.2rem;
+            animation: floatHeart 1s ease-out forwards;
+        }
+        @keyframes floatHeart {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
+        }
+        
+        /* Main Content - Awalnya disembunyikan */
+        .main-content {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .main-content.visible {
+            opacity: 1;
+        }
+         /* Parents & Prayer */
+        .parents-info, .prayer-card {
+        background: white;
+        border-radius: 40px;
+        padding: 30px;
+        margin-top: 30px;
+        text-align: center;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.05);
+        }
+        .arabic {
+        font-size: 1.8rem;
+        font-family: 'Amiri', serif;
+        line-height: 1.6;
+        }
+        .script {
+            font-family: 'Parisienne', cursive;
+            font-weight: normal;
+        }
+        
+        /* Responsive */
+        @media (max-width: 650px) {
+            .hero .script-name { font-size: 2.5rem; }
+            .time-box { width: 65px; }
+            .timeline-item { flex-direction: column; text-align: center; }
+            section { padding: 50px 20px; }
+            #google-map { height: 280px; }
+            .gallery-grid { gap: 15px; margin-top: 30px; }
+            .splash-name { font-size: 2rem; }
+            .splash-guest { font-size: 1.2rem; }
+        }
+
+        /* form */
+        .container-form {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 500px;
+        width: 100%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 10px;
+        }
+        .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+        font-style: italic;
+        }
+        .form-group {
+        margin-bottom: 20px;
+        }
+        label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #555;
+        }
+        input, select, textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+        }
+        input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        }
+        .radio-group {
+        display: flex;
+        gap: 20px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+        }
+        .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        }
+        .radio-option input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        cursor: pointer;
+        }
+        .radio-option label {
+        margin: 0;
+        cursor: pointer;
+        font-weight: normal;
+        }
+        .button-form {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s;
+        }
+        .button-form:hover {
+        transform: translateY(-2px);
+        }
+        button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        }
+        .message {
+        margin-top: 20px;
+        padding: 12px;
+        border-radius: 10px;
+        text-align: center;
+        display: none;
+        }
+        .message.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        display: block;
+        }
+        .message.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        display: block;
+        }
+        .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+        margin-right: 8px;
+        vertical-align: middle;
+        }
+        @keyframes spin {
+        to { transform: rotate(360deg); }
+        }
+        .required {
+        color: red;
+        }
+        .note {
+        font-size: 12px;
+        color: #888;
+        margin-top: 5px;
+        }
+        /* css view */
+        .stat-card { text-align: center; flex: 1; min-width: 120px; }
+            .stat-number { font-size: 2rem; font-weight: bold; color: #667eea; }
+            .stat-label { color: #666; margin-top: 5px; }
+            .filter-section {
+                background: white;
+                border-radius: 20px;
+                padding: 20px;
+                margin-bottom: 30px;
+            }
+            .filter-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
+            .filter-btn {
+                padding: 8px 20px;
+                border: 2px solid #667eea;
+                background: white;
+                color: #667eea;
+                border-radius: 30px;
+                cursor: pointer;
+            }
+            .filter-btn.active { background: #667eea; color: white; }
+            .search-box input {
+                width: 100%;
+                padding: 12px 20px;
+                border: 2px solid #e0e0e0;
+                border-radius: 30px;
+                font-size: 16px;
+            }
+            .card-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                gap: 25px;
+                margin-top: 20px;
+            }
+            .rsvp-card {
+                background: white;
+                border-radius: 20px;
+                padding: 25px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+                transition: transform 0.2s;
+            }
+            .rsvp-card:hover { transform: translateY(-5px); }
+            .card-name {
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: #333;
+                margin-bottom: 10px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .status-badge {
+                padding: 4px 12px;
+                border-radius: 30px;
+                font-size: 0.7rem;
+                font-weight: bold;
+            }
+            .status-hadir { background: #d4edda; color: #155724; }
+            .status-tidak { background: #f8d7da; color: #721c24; }
+            .card-message {
+                margin-top: 15px;
+                padding: 12px;
+                background: #f9f9f9;
+                border-radius: 12px;
+                font-style: italic;
+                color: #555;
+            }
+            .empty-state {
+                text-align: center;
+                padding: 50px;
+                background: white;
+                border-radius: 20px;
+                color: #888;
+            }
+            .pagination {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-top: 30px;
+                flex-wrap: wrap;
+            }
+            .page-btn {
+                padding: 8px 15px;
+                border: 1px solid #ddd;
+                background: white;
+                border-radius: 8px;
+                cursor: pointer;
+            }
+            .page-btn.active { background: #667eea; color: white; border-color: #667eea; }
+            .loading, .error {
+                text-align: center;
+                padding: 50px;
+                background: white;
+                border-radius: 20px;
+            }
+            .spinner {
+                width: 50px;
+                height: 50px;
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #667eea;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin: 0 auto 20px;
+            }
+            @keyframes spin { to { transform: rotate(360deg); } }
+            .error { background: #f8d7da; color: #721c24; }
+            .last-update { text-align: center; margin-top: 30px; color: rgba(255,255,255,0.7); font-size: 0.8rem; }
+            @media (max-width: 768px) { .card-grid { grid-template-columns: 1fr; } }
+
+         
+    </style>
 </head>
 <body>
 
-<div class="loading-screen" id="loadingScreen">
-  <div class="ring"></div>
-  <p>Bismillahirrahmanirrahim</p>
+<!-- SPLASH SCREEN (HALAMAN PEMBUKA) -->
+<div class="splash-screen" id="splashScreen">
+    <!-- Dekorasi Bunga Floating -->
+    <div class="splash-flower splash-flower-1">🌸</div>
+    <div class="splash-flower splash-flower-2">🌹</div>
+    <div class="splash-flower splash-flower-3">🌺</div>
+    <div class="splash-flower splash-flower-4">🌷</div>
+    <div class="splash-flower splash-flower-5">🌼</div>
+    <div class="splash-flower splash-flower-6">🪷</div>
+    
+    <div class="splash-content">
+        <p class="splash">WEDDING INVITATION </p>
+        <h1 class="splash-name">Annastasya & Rahman</h1>
+        <br>
+        <br>
+        <p class="plash-date">Kpd Bapak/Ibu/Saudara/i</p>
+        <br>
+        <p class="splash-guest" id="splashGuestText">
+            <span id="splashGuestName">Loading...</span>
+        </p>
+        <p class="splash-date">Ahad, 13 September 2026</p>
+        <!-- <div class="ring-animation"></div> -->
+        <button class="btn-enter" id="enterButton">
+            <i class="fas fa-envelope-open-heart"></i> Buka Undangan
+            <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
 </div>
 
-<!-- <audio id="bgMusic" loop>
-   <source src="Stephen-song.mp3" type="audio/mpeg">
-  <source src="Blue.mp3" type="audio/mpeg">
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
-</audio>
-<div class="music-player">
-  <div class="equalizer"><span></span><span></span><span></span><span></span></div>
-  <button class="music-toggle" id="musicToggleBtn"><i class="fas fa-volume-up"></i></button>
-</div> -->
- <!-- MUSIK BACKGROUND -->
 <audio id="bgMusic" loop preload="auto">
     <source src="Blue.mp3" type="audio/mpeg">
 </audio>
 
-<!-- Music Player Widget -->
 <div class="music-player" id="musicPlayer">
-    <div class="equalizer" id="equalizerVis">
-        <span></span><span></span><span></span><span></span>
-    </div>
-    <button class="music-toggle" id="musicToggleBtn">
-        <i class="fas fa-volume-up"></i>
-    </button>
+    <div class="equalizer" id="equalizerVis"><span></span><span></span><span></span><span></span></div>
+    <button class="music-toggle" id="musicToggleBtn"><i class="fas fa-volume-up"></i></button>
 </div>
 
-<!-- Hint untuk memulai musik -->
-<div class="autoplay-hint" id="autoplayHint">
-    <i class="fas fa-music"></i> Klik di sini untuk memutar musik
-</div>
+<main id="mainContent" class="main-content">
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container hero-content">
+            <p class="script" style="font-size:1.4rem;">The Wedding of</p>
+            <h1 class="script script-name">Annastasya & Rahman</h1>
+            <p class="date" style="margin:15px 0">Sabtu, 13 September 2026</p>
+            <div class="countdown" id="countdownTimer">
+                <div class="time-box"><div class="time-num" id="days">00</div><div>Hari</div></div>
+                <div class="time-box"><div class="time-num" id="hours">00</div><div>Jam</div></div>
+                <div class="time-box"><div class="time-num" id="minutes">00</div><div>Menit</div></div>
+                <div class="time-box"><div class="time-num" id="seconds">00</div><div>Detik</div></div>
+            </div>
+        </div>
+    </section>
 
-<div id="musicErrorMsg" class="music-error"></div>
+    <!-- Info & Doa -->
+    <section data-aos="fade-up">
+        <div class="container">
+            <div style="text-align:center; background:white; border-radius:40px; padding:30px; margin-bottom:30px">
+                <p>Assalamu'alaikum Wr. Wb.</p>
+                <p style="margin-top:15px">Tanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i pada acara pernikahan kami.</p>
+                <div class="parents-info fade-up">
+                    <h3 class="script" style="font-size:2rem">Annastasya Ria Dewi</h3>
+                    <p>Putri kedua dari (alm) Bapak Asep Ria Setiawan & Ibu Eulis Hayati</p>
+                    <div style="height:1px; background:#cfe9ff; width:50px; margin:20px auto"></div>
+                    <h3 class="script" style="font-size:2rem">Rahman Subrata</h3>
+                    <p>Putra kedua dari Bapak Tata & Ibu Nining Suharningsih</p>
+                </div>
+            </div>
+            <div style="background:white; border-radius:40px; padding:30px; text-align:center">
+                <h3>Doa Untuk Pengantin</h3>
+                <p style="font-size:1.5rem; margin:15px 0">بَارَكَ اللهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِى خَيْرٍ</p>
+                <p><em>Barakallahu laka wa baraka 'alaika wa jama'a bainakuma fii khair</em></p>
+                <p>"Mudah-mudahan Allah memberkahi engkau dalam segala hal dan mempersatukan kamu berdua dalam kebaikan"</p>
+            </div>
+        </div>
+    </section>
 
+    <!-- Love Story -->
+    <section id="lovestory" data-aos="fade-up">
+        <div class="container">
+            <h2 class="script" style="text-align:center; font-size:2.8rem; color:#2c6c9e;">Our Story</h2>
+            <div class="timeline">
+                <div class="timeline-item" data-aos="fade-right"><div class="timeline-icon">🌿</div><div><strong>Juli 2016</strong><br>1st Meet: Dipertemukan dalam satu kelas di SMA 3 Sumedang.</div></div>
+                <div class="timeline-item" data-aos="fade-left"><div class="timeline-icon">💙</div><div><strong>2016-2017</strong><br>Menjadi Teman satu kelas yang bantu membantu dalam mengerjakan PR dan tugas Sekolah.</div></div>
+                <div class="timeline-item" data-aos="fade-right"><div class="timeline-icon">📖</div><div><strong>2018-2026</strong><br>Masing masing menjalankan kehidupan kuliah dan bekerja, Cukup Jarang bertemu dan komunikasi. Rahman kuliah di Bogor , Tasya di Sumedang. Rahman bekerja di Jakarta , Tasya bekerja di Sumedang.</div></div>
+                <div class="timeline-item" data-aos="fade-left"><div class="timeline-icon">💬</div><div><strong>24 April 2026</strong><br>1st Discuss: Rahman mencoba menghubungi kembali Tasya setelah sekian lama tidak komunikasi dan tidak bertemu. Rahman beniat untuk bisa memulai hubungan serius disebuah ikatan suci pernikahan.</div></div>
+                <div class="timeline-item" data-aos="fade-right"><div class="timeline-icon">🏠</div><div><strong>Mei - Juli 2025</strong><br>Rahman datang ke rumah Tasya untuk bertemu dengan keluarga Tasya untuk menyampaikan niat baik ke jenjang pernikahan dan dilanjutkan Silaturahim Keluarga & Khitbah.</div></div>
+                <div class="timeline-item" data-aos="fade-left"><div class="timeline-icon">🤝</div><div><strong>13 September 2026</strong><br>Akad Nikah: Mitsaqan Ghaliza (perjanjian kokoh) untuk berkolaborasi dan bermanfaat lebih luas.</div></div>
+            </div>
+        </div>
+    </section>
 
-<main id="mainContent" style="opacity:0; transition:0.5s">
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="container hero-content fade-up">
-      <p class="p-script" style="font-size:1.4rem;">The Wedding of</p>
-      <h1 class="script script-name">Annastasya & Rahman</h1>
-      <p class="date" style="margin:15px 0">Ahad, 13 September 2026</p>
-      <div class="countdown" id="countdownTimer">
-        <div class="time-box"><div class="time-num" id="days">00</div><div>Hari</div></div>
-        <div class="time-box"><div class="time-num" id="hours">00</div><div>Jam</div></div>
-        <div class="time-box"><div class="time-num" id="minutes">00</div><div>Menit</div></div>
-        <div class="time-box"><div class="time-num" id="seconds">00</div><div>Detik</div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Salam & Informasi Orang Tua -->
-  <section>
-    <div class="container">
-      <div class="fade-up" style="text-align:center">
-        <p>Assalamu'alaikum Wr. Wb.</p>
-        <p style="margin-top:15px">Tanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i pada acara pernikahan kami.</p>
-      </div>
-      <div class="parents-info fade-up">
-        <h3 class="script" style="font-size:2rem">Annastasya Ria Dewi</h3>
-        <p>Putri kedua dari (alm) Bapak Asep Ria Setiawan & Ibu Eulis Hayati</p>
-        <div style="height:1px; background:#cfe9ff; width:50px; margin:20px auto"></div>
-        <h3 class="script" style="font-size:2rem">Rahman Subrata</h3>
-        <p>Putra kedua dari Bapak Tata & Ibu Nining Suharningsih</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Doa Pengantin Baru -->
-  <section>
-    <div class="container prayer-card fade-up">
-      <h3>Doa Untuk Pengantin</h3>
-      <div class="arabic">بَارَكَ اللهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِى خَيْرٍ</div>
-      <p><em>Barakallahu laka wa baraka ‘alaika wa jama’a bainakuma fii khair</em></p>
-      <p>"Mudah-mudahan Allah memberkahi engkau dalam segala hal dan mempersatukan kamu berdua dalam kebaikan"</p>
-    </div>
-  </section>
-
-  <!-- Our Story (lebih detail seperti referensi) -->
-  <section>
-    <div class="container">
-      <h2 class="script" style="text-align:center; font-size:2.8rem; color:#2c6c9e;">Our Story</h2>
-      <p style="text-align:center; margin-bottom:20px"><i>"Dan melangkahlah dengan percaya, bahwa bersama-Nya semua akan baik-baik saja"</i></p>
-      <div class="timeline">
-        <div class="timeline-item fade-up"><div class="timeline-icon">🌿</div><div><strong>Juli 2016</strong><br>1st Meet: Dipertemukan dalam satu kelas di SMA 3 Sumedang.</div></div>
-        <div class="timeline-item fade-up"><div class="timeline-icon">💙</div><div><strong>2016-2017</strong><br>Menjadi Teman satu kelas yang bantu membantu dalam mengerjakan PR dan tugas Sekolah.</div></div>
-        <div class="timeline-item fade-up"><div class="timeline-icon">📖</div><div><strong>2018-2026</strong><br>Masing masing menjalankan kehidupan kuliah dan bekerja, Cukup Jarang bertemu dan komunikasi. Rahman kuliah di Bogor , Tasya di Sumedang. Rahman bekerja di Jakarta , Tasya bekerja di Sumedang.</div></div>
-        <div class="timeline-item fade-up"><div class="timeline-icon">💬</div><div><strong>24 April 2026</strong><br>1st Discuss: Rahman mencoba menghubungi kembali Tasya setelah sekian lama tidak komunikasi dan tidak bertemu. Rahman beniat untuk bisa memulai hubungan serius disebuah ikatan suci pernikahan.</div></div>
-        <div class="timeline-item fade-up"><div class="timeline-icon">🏠</div><div><strong>Mei - Juli 2025</strong><br>Rahman datang ke rumah Tasya untuk bertemu dengan keluarga Tasya untuk menyampaikan niat baik ke jenjang pernikahan dan dilanjutkan Silaturahim Keluarga & Khitbah.</div></div>
-        <div class="timeline-item fade-up"><div class="timeline-icon">🤝</div><div><strong>13 September 2026</strong><br>Akad Nikah: Mitsaqan Ghaliza (perjanjian kokoh) untuk berkolaborasi dan bermanfaat lebih luas.</div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Detail Acara & Map -->
-  <section>
-    <div class="container">
-      <h2 class="script" style="text-align:center; font-size:2.5rem;">Save The Date</h2>
-      <div class="details-card" style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center; margin:30px 0">
-        <div class="card" style="background:white; border-radius:40px; padding:25px; flex:1; min-width:240px"><i class="fas fa-mosque" style="font-size:2rem; color:#5f9dc9;"></i><h3>Akad Nikah</h3><p>Sabtu, 13 September 2026<br>07.30 - 09.00 WIB</p><p>Link. Karapyak<br>Jl. Angkrek Situ, kel. Situ, Sumedang Utara, Sumedang</p></div>
-        <div class="card" style="background:white; border-radius:40px; padding:25px; flex:1; min-width:240px"><i class="fas fa-glass-cheers" style="font-size:2rem; color:#5f9dc9;"></i><h3>Resepsi</h3><p>Sabtu, 13 September 2026<br>10.00 - 13.00 WIB</p>Link. Karapyak<br>Jl. Angkrek Situ, kel. Situ, Sumedang Utara, Sumedang</p></div>
-      </div>
-      <!-- <div id="map"></div>
-      <p style="text-align:center; margin-top:15px"><i class="fas fa-map-marker-alt"></i> Klik peta untuk navigasi</p> -->
-       <div class="map-container">
+    <!-- Acara & Google Maps -->
+    <section id="events" data-aos="fade-up">
+        <div class="container">
+            <h2 class="script" style="text-align:center; font-size:2.5rem;">Save The Date</h2>
+            <div class="details-card">
+                <div class="card" data-aos="zoom-in"><i class="fas fa-mosque" style="font-size:2rem; color:#5f9dc9;"></i><h3>Akad Nikah</h3><p>Sabtu, 13 September 2026<br>07.30 - 09.00 WIB</p><p>Gg. Sadewa, Situ, Kec. Sumedang Utara, Kabupaten Sumedang, Jawa Barat 456</p></div>
+                <div class="card" data-aos="zoom-in" data-aos-delay="100"><i class="fas fa-glass-cheers" style="font-size:2rem; color:#5f9dc9;"></i><h3>Resepsi</h3><p>Sabtu, 13 September 2026<br>10.00 - 13.00 WIB</p><p>Gg. Sadewa, Situ, Kec. Sumedang Utara, Kabupaten Sumedang, Jawa Barat 456</p></div>
+            </div>
+            
+            <!-- Google Maps -->
+            <div class="map-container">
                 <iframe 
                     id="google-map"
-                    src="https://maps.google.com/maps?q=Pendopo+Uti,+Jatiasih,+Bekasi&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                    src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d264.35592851198464!2d107.91949198531829!3d-6.834077227700091!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sid!4v1776506942212!5m2!1sen!2sid"
                     frameborder="0"
-                    allowfullscreen>
+                    allowfullscreen
+                    referrerpolicy="no-referrer-when-downgrade">
                 </iframe>
                 <div class="map-button">
-                    <a href="https://maps.google.com/maps?q=Pendopo+Uti,+Jatiasih,+Bekasi" 
+                    <a href="https://maps.app.goo.gl/6KRe6y1qtFUuT2oR9" 
                        target="_blank" 
                        class="btn-navigate">
                         <i class="fas fa-location-dot"></i> Buka Navigasi Google Maps
                     </a>
                 </div>
                 <p style="text-align:center; margin-top:15px; font-size:13px; color:#666;">
-                    <i class="fas fa-map-marker-alt"></i> Pendopo Uti, Jl. Tim. Asih, RT.007/RW.008, Jatiasih, Kota Bekasi
+                    <i class="fas fa-map-marker-alt"></i> Gg. Sadewa, Situ, Kec. Sumedang Utara, Kabupaten Sumedang, Jawa Barat 456
                 </p>
             </div>
-    </div>
-  </section>
+        </div>
+    </section>
 
-  <!-- Galeri Foto -->
-  <!-- <section>
-    <div class="container">
-      <h2 class="script" style="text-align:center; font-size:2.5rem;">Gallery</h2>
-      <div class="gallery-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:20px; margin-top:30px">
-        <img src="https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&dpr=2" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:30px">
-        <img src="https://images.pexels.com/photos/1456580/pexels-photo-1456580.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&dpr=2" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:30px">
-        <img src="https://images.pexels.com/photos/2253870/pexels-photo-2253870.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&dpr=2" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:30px">
-        <img src="https://images.pexels.com/photos/1755385/pexels-photo-1755385.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&dpr=2" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:30px">
-      </div>
-    </div>
-  </section> -->
+        <!-- RSVP Form -->
+    <section id="rsvp" data-aos="fade-up">
+        <div class="container">
+            <h2 class="script" style="text-align:center">RSVP Kehadiran</h2>
+                <form id="rsvpForm">
+                    <div class="form-group">
+                        <label>Nama Lengkap <span class="required">*</span></label>
+                        <input type="text" id="nama" name="entry.1836133497" required placeholder="Contoh: Annastasya Putri">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Kehadiran <span class="required">*</span></label>
+                        <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="hadir_ya" name="entry.1046409688" value="Ya" required>
+                            <label for="hadir_ya">YA, saya akan hadir</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="hadir_tidak" name="entry.1046409688" value="Tidak">
+                            <label for="hadir_tidak">TIDAK, saya tidak bisa hadir</label>
+                        </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="jumlahTamuGroup" style="display: none;">
+                        <label>Jumlah Tamu yang Dibawa</label>
+                        <input type="number" id="jumlah_tamu" name="entry.853313957" min="1" max="10" placeholder="Maksimal 10 orang">
+                        <div class="note">Kosongkan jika tidak membawa tamu</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Ucapan dan Doa</label>
+                        <textarea id="ucapan" name="entry.392144659" rows="3" placeholder="Tuliskan doa dan ucapan terbaik Anda untuk Annastasya & Rahman..."></textarea>
+                    </div>
+                    
+                    <button class="button-form" type="submit" id="submitBtn">
+                        Kirim Konfirmasi Kehadiran
+                    </button>
+                </form>
+                    
+                <div id="message" class="message"></div>
 
-  <!-- Our Song (spesial) -->
-   <section id="oursong">
-        <div class="container our-song fade-up">
+            <div id="rsvpMessage" style="text-align:center; margin-top:15px"></div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+                <div class="header">
+                    <h1>💝 Daftar Konfirmasi Kehadiran 💝</h1>
+                    <p>Annastasya & Rahman</p>
+                </div>
+
+                <div id="content">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Memuat data konfirmasi...</p>
+                    </div>
+                </div>
+
+                <div class="last-update" id="lastUpdate"></div>
+        </div>
+    </section>
+
+    <!-- Our Song -->
+    <section id="oursong" data-aos="flip-up">
+        <div class="container our-song">
             <h2 class="script" style="font-size:2.2rem;">🎵 Our Song 🎵</h2>
-            <p>"Blue Yung Kai - Lagu spesial untuk momen terindah kami"</p>
+            <p>"Stephen - Lagu spesial untuk momen terindah kami"</p>
             <div style="display: flex; justify-content: center; gap: 8px; margin: 20px 0;">
                 <div class="song-bar"></div><div class="song-bar"></div><div class="song-bar"></div><div class="song-bar"></div><div class="song-bar"></div>
             </div>
@@ -723,135 +945,77 @@
         </div>
     </section>
 
-  <!-- RSVP & Gift -->
-  <section>
-    <div class="container">
-      <h2 class="script" style="text-align:center">RSVP Kehadiran</h2>
-         <form id="rsvpForm">
-            <div class="form-group">
-                <label>Nama Lengkap <span class="required">*</span></label>
-                <input type="text" id="nama" name="entry.1836133497" required placeholder="Contoh: Annastasya Putri">
-            </div>
-            
-            <div class="form-group">
-                <label>Kehadiran <span class="required">*</span></label>
-                <div class="radio-group">
-                <div class="radio-option">
-                    <input type="radio" id="hadir_ya" name="entry.1046409688" value="Ya" required>
-                    <label for="hadir_ya">YA, saya akan hadir</label>
-                </div>
-                <div class="radio-option">
-                    <input type="radio" id="hadir_tidak" name="entry.1046409688" value="Tidak">
-                    <label for="hadir_tidak">TIDAK, saya tidak bisa hadir</label>
-                </div>
-                </div>
-            </div>
-            
-            <div class="form-group" id="jumlahTamuGroup" style="display: none;">
-                <label>Jumlah Tamu yang Dibawa</label>
-                <input type="number" id="jumlah_tamu" name="entry.853313957" min="1" max="10" placeholder="Maksimal 10 orang">
-                <div class="note">Kosongkan jika tidak membawa tamu</div>
-            </div>
-            
-            <div class="form-group">
-                <label>Ucapan dan Doa</label>
-                <textarea id="ucapan" name="entry.392144659" rows="3" placeholder="Tuliskan doa dan ucapan terbaik Anda untuk Annastasya & Rahman..."></textarea>
-            </div>
-            
-            <button type="submit" id="submitBtn">
-                Kirim Konfirmasi Kehadiran
-            </button>
-        </form>
-            
-        <div id="message" class="message"></div>
 
-      <div id="rsvpMessage" style="text-align:center; margin-top:15px"></div>
-    </div>
-  </section>
 
-  <section>
-     <div class="container">
-            <div class="header">
-                <h1>💝 Daftar Konfirmasi Kehadiran 💝</h1>
-                <p>Annastasya & Rahman</p>
-            </div>
+    <!-- Gift -->
+    <section id="gift" data-aos="fade-up">
+        <div class="container gift-box">
+            <i class="fas fa-gift" style="font-size:3rem; color:#6a9fc7"></i>
+            <h3>Wedding Gift</h3>
+            <p>Doa terbaik adalah kado utama. Untuk yang ingin memberikan tanda kasih:</p>
+            <p><strong>BCA: 123 a.n Rahman</strong><br>BCA: 123 a.n Annastasya</p>
+        </div>
+    </section>
 
-            <div id="content">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Memuat data konfirmasi...</p>
-                </div>
-            </div>
-
-            <div class="last-update" id="lastUpdate"></div>
-    </div>
-  </section>
-
-  <section>
-    <div class="container gift-box">
-      <i class="fas fa-gift" style="font-size:3rem; color:#6a9fc7"></i>
-      <h3>Wedding Gift</h3>
-      <p>Doa terbaik adalah kado utama. Untuk yang ingin memberikan tanda kasih:</p>
-      <p><strong>BCA: 123 a.n Annastasya Ria Dewi</strong><br>BCA: 123 a.n Rahman Subrata</p>
-    </div>
-  </section>
-
-  <!-- Vendor & Penutup -->
-  <section>
-    <div class="container" style="text-align:center">
-      <h3 class="script">Wedding Vendor</h3>
-      <div class="vendor-list"><span>📸 Momeny Photo</span><span>-</span><span>-</span></div>
-      <p style="margin-top:30px">Atas kehadiran dan Doa Restunya, kami ucapkan terimakasih.<br>Keluarga Besar Annastasya & Rahman</p>
-    </div>
-  </section>
-
-  <footer>
-    <p>© 2026 Pernikahan Annastasya & Rahman — "Dan di antara tanda-tanda kekuasaan-Nya, Dia menciptakan pasangan hidup untukmu..." (QS. Ar-Rum 21)</p>
-  </footer>
+    <footer>
+        <p>© 2026 Pernikahan Annastasya & Rahman — "Dan di antara tanda-tanda kekuasaan-Nya, Dia menciptakan pasangan hidup untukmu..."</p>
+    </footer>
 </main>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-  // Inisialisasi AOS
-    AOS.init({ once: true, duration: 800 });
-  // Loading & Parameter Sapaan
-  (function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const dearName = urlParams.get('dear') || 'Keluarga & Sahabat';
-    const hero = document.querySelector('.hero-content p.p-script');
-    if(hero) hero.innerHTML = `Kepada Yth. ${dearName}`;
-    
-    const loading = document.getElementById('loadingScreen');
-    const main = document.getElementById('mainContent');
-    function hideLoad() { loading.classList.add('hide'); setTimeout(()=>loading.style.display='none',800); main.style.opacity='1'; }
-    if(document.readyState==='complete') setTimeout(hideLoad,600);
-    else window.addEventListener('load',()=>setTimeout(hideLoad,600));
-    setTimeout(hideLoad,3000);
-  })();
-
-  // Musik
-   // ============================================================
-    // 2. AUTOPLAY MUSIK (AKTIF SETELAH INTERAKSI)
     // ============================================================
-     const bgAudio = document.getElementById('bgMusic');
+    // 1. AMBIL NAMA TAMU DARI URL (?to=Nama)
+    // ============================================================
+    function getGuestName() {
+        const urlParams = new URLSearchParams(window.location.search);
+        let guest = urlParams.get('to');
+        if (guest) {
+            guest = decodeURIComponent(guest);
+            const div = document.createElement('div');
+            div.textContent = guest;
+            return div.innerHTML;
+        }
+        return null;
+    }
+
+    const guestName = getGuestName();
+    
+    // Tampilkan di Splash Screen
+    const splashGuestElement = document.getElementById('splashGuestName');
+    if (guestName) {
+        splashGuestElement.innerHTML = guestName;
+    } else {
+        splashGuestElement.innerHTML = 'Ditempat';
+    }
+
+    
+    // ============================================================
+    // 2. TOMBOL UNTUK MASUK KE UNDANGAN
+    // ============================================================
+    const splashScreen = document.getElementById('splashScreen');
+    const mainContent = document.getElementById('mainContent');
+    const enterButton = document.getElementById('enterButton');
+    
+    enterButton.addEventListener('click', () => {
+        // Sembunyikan splash screen dengan animasi
+        splashScreen.classList.add('hide');
+        // Tampilkan konten utama
+        mainContent.classList.add('visible');
+        // Scroll ke atas
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Mulai musik setelah user klik tombol (autoplay)
+        startBackgroundMusic();
+    });
+    
+    // ============================================================
+    // 3. MUSIK BACKGROUND
+    // ============================================================
+    const bgAudio = document.getElementById('bgMusic');
     const toggleBtn = document.getElementById('musicToggleBtn');
     const eqSpans = document.querySelectorAll('#equalizerVis span');
-    const autoplayHint = document.getElementById('autoplayHint');
-    const musicErrorMsg = document.getElementById('musicErrorMsg');
-    
     let musicPlaying = false;
     let musicStarted = false;
-    let retryCount = 0;
-    const MAX_RETRY = 3;
-    
-    function showErrorMsg(text) {
-        musicErrorMsg.textContent = text;
-        musicErrorMsg.style.display = 'block';
-        setTimeout(() => {
-            musicErrorMsg.style.display = 'none';
-        }, 5000);
-    }
     
     function animateEqualizer(active) {
         eqSpans.forEach(span => span.style.animationPlayState = active ? 'running' : 'paused');
@@ -859,45 +1023,14 @@
     
     function startBackgroundMusic() {
         if (musicStarted) return;
-        
         bgAudio.play().then(() => {
             musicPlaying = true;
             musicStarted = true;
             toggleBtn.innerHTML = '<i class="fas fa-music"></i>';
             animateEqualizer(true);
-            
-            // Sembunyikan hint
-            if (autoplayHint) {
-                autoplayHint.style.opacity = '0';
-                autoplayHint.style.visibility = 'hidden';
-            }
-            retryCount = 0;
-        }).catch((error) => {
-            console.error("Gagal memutar musik:", error);
-            
-            if (error.name === 'NotAllowedError') {
-                // Browser mencegah autoplay, hint sudah ditampilkan
-                console.log("Autoplay diblokir browser, menunggu interaksi user");
-            } else if (error.name === 'NotSupportedError') {
-                showErrorMsg("❌ Format file MP3 tidak didukung browser Anda");
-            } else {
-                // Coba retry dengan file alternatif (SoundHelix)
-                if (retryCount < MAX_RETRY) {
-                    retryCount++;
-                    console.log(`Retry ${retryCount}/${MAX_RETRY} dengan URL alternatif...`);
-                    bgAudio.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3';
-                    bgAudio.load();
-                    setTimeout(() => {
-                        if (!musicStarted) startBackgroundMusic();
-                    }, 500);
-                } else {
-                    showErrorMsg("⚠️ Gagal memutar musik. Periksa koneksi internet Anda.");
-                }
-            }
-        });
+        }).catch(e => console.log("Autoplay perlu interaksi"));
     }
     
-    // Tombol musik manual
     toggleBtn.onclick = (e) => {
         e.stopPropagation();
         if (musicPlaying) {
@@ -911,44 +1044,12 @@
                 musicStarted = true;
                 toggleBtn.innerHTML = '<i class="fas fa-music"></i>';
                 animateEqualizer(true);
-                if (autoplayHint) autoplayHint.style.display = 'none';
-            }).catch((err) => {
-                console.error("Manual play error:", err);
-                showErrorMsg("❌ Gagal memutar musik. Coba refresh halaman.");
-            });
+            }).catch(e => console.log("Gagal play audio"));
         }
     };
     
-    // Klik hint untuk memulai musik
-    if (autoplayHint) {
-        autoplayHint.onclick = (e) => {
-            e.stopPropagation();
-            startBackgroundMusic();
-        };
-    }
-    
-    // Autoplay setelah berbagai interaksi
-    const eventsForAutoplay = ['click', 'touchstart', 'scroll'];
-    eventsForAutoplay.forEach(eventName => {
-        window.addEventListener(eventName, startBackgroundMusic, { once: true });
-    });
-    
-    // Cek apakah file MP3 tersedia (preload check)
-    bgAudio.addEventListener('error', (e) => {
-        console.error("Audio element error:", e);
-        if (bgAudio.error) {
-            switch(bgAudio.error.code) {
-                case 4:
-                    showErrorMsg("❌ File MP3 tidak ditemukan. Pastikan assets/music/Stephen-song.mp3 sudah diupload.");
-                    break;
-                default:
-                    showErrorMsg("⚠️ Gagal memuat file musik. Coba refresh halaman.");
-            }
-        }
-    });
-    
     // ============================================================
-    // 3. OUR SONG SPESIAL
+    // 4. OUR SONG SPESIAL
     // ============================================================
     const specialSongBtn = document.getElementById('playSpecialSongBtn');
     let specialAudio = null;
@@ -960,12 +1061,9 @@
             isSpecialPlaying = false;
             specialSongBtn.innerHTML = '<i class="fas fa-play"></i> Putar Lagu Spesial';
         } else {
-            if (specialAudio) {
-                specialAudio.pause();
-            }
-            specialAudio = new Audio('Blue.mp3');
+            if (specialAudio) specialAudio.pause();
+            specialAudio = new Audio('assets/music/Stephen-song.mp3');
             specialAudio.play().catch(e => {
-                console.error("Special song error:", e);
                 specialSongBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal, coba lagi';
                 setTimeout(() => {
                     specialSongBtn.innerHTML = '<i class="fas fa-play"></i> Putar Lagu Spesial';
@@ -973,7 +1071,6 @@
             });
             isSpecialPlaying = true;
             specialSongBtn.innerHTML = '<i class="fas fa-heart"></i> Sedang Diputar';
-            
             specialAudio.onended = () => {
                 isSpecialPlaying = false;
                 specialSongBtn.innerHTML = '<i class="fas fa-play"></i> Putar Lagu Spesial';
@@ -981,172 +1078,71 @@
             };
         }
     };
-  
-  // Countdown ke 12 April 2026
-  function updateCountdown(){
-    const target=new Date('September 13, 2026 07:30:00').getTime();
-    const now=new Date().getTime();
-    const d=target-now;
-    if(d<0){ document.getElementById('days').innerText='00'; document.getElementById('hours').innerText='00'; document.getElementById('minutes').innerText='00'; document.getElementById('seconds').innerText='00'; return; }
-    const days=Math.floor(d/(1000*60*60*24)), hours=Math.floor((d%(86400000))/3600000), mins=Math.floor((d%3600000)/60000), secs=Math.floor((d%60000)/1000);
-    document.getElementById('days').innerText=days<10?'0'+days:days;
-    document.getElementById('hours').innerText=hours<10?'0'+hours:hours;
-    document.getElementById('minutes').innerText=mins<10?'0'+mins:mins;
-    document.getElementById('seconds').innerText=secs<10?'0'+secs:secs;
-  }
-  setInterval(updateCountdown,1000); updateCountdown();
-  
-  // Map (Pendopo Uti, Bekasi)
-  // const map=L.map('map').setView([-6.833992, 107.919447],15);
-  // L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
-  // L.marker([-6.833992, 107.919447]).addTo(map).bindPopup('📍 Jl. Angkrek Situ No.34, RT.003/RW.009, Situ, Kec. Sumedang Utara, Kabupaten Sumedang, Jawa Barat 53738').openPopup();
-  
-  // RSVP
-//   document.getElementById('rsvpForm').addEventListener('submit',(e)=>{
-//     e.preventDefault(); const name=document.getElementById('guestName').value;
-//     if(!name.trim()){ document.getElementById('rsvpMessage').innerHTML='Mohon isi nama lengkap.'; return; }
-//     document.getElementById('rsvpMessage').innerHTML=`💙 Terima kasih ${name}, konfirmasi Anda tersimpan. InsyaAllah kami catat. 💙`;
-//     e.target.reset(); setTimeout(()=>document.getElementById('rsvpMessage').innerHTML='',4000);
-//   });
-  
-  // Floating elemen & animasi scroll
-  const faders=document.querySelectorAll('.fade-up');
-  const observer=new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('appear'); observer.unobserve(e.target); } }); },{threshold:0.2});
-  faders.forEach(f=>observer.observe(f));
-  
-  setInterval(()=>{ let d=document.createElement('div'); d.classList.add('floating-petal'); d.innerHTML='☁️✨'; d.style.position='fixed'; d.style.left=Math.random()*100+'%'; d.style.top='-20px'; d.style.fontSize=(Math.random()*20+14)+'px'; d.style.opacity=0.5; d.style.animation='floatClouds 10s linear forwards'; d.style.pointerEvents='none'; document.body.appendChild(d); setTimeout(()=>d.remove(),10000); },2500);
-  const style=document.createElement('style'); style.textContent=`@keyframes floatClouds{ 0%{transform:translateY(0) rotate(0deg); opacity:0;} 10%{opacity:0.6;} 90%{opacity:0.3;} 100%{transform:translateY(100vh) rotate(360deg); opacity:0;}} .floating-petal{ position:fixed; z-index:999; }`; document.head.appendChild(style);
-// https://docs.google.com/forms/d/e/1FAIpQLSc7bXSOTJbSn0KAu2UTrmfo5dSXKaME8HejZGRCh80jl9eVjw/viewform?usp=pp_url&
-// entry.1836133497=test&entry.1046409688=Ya&entry.853313957=1&entry.392144659=test%0A
+    
+    // ============================================================
+    // 5. HEART PARTICLES (Efek klik)
+    // ============================================================
+    document.body.addEventListener('click', (e) => {
+        // Jangan munculkan heart saat klik di splash screen
+        if (splashScreen && !splashScreen.classList.contains('hide')) return;
+        
+        const heart = document.createElement('div');
+        heart.className = 'heart-particle';
+        heart.innerHTML = ['❤️', '💙', '💜', '💖', '💗'][Math.floor(Math.random() * 5)];
+        heart.style.left = e.clientX - 10 + 'px';
+        heart.style.top = e.clientY - 10 + 'px';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
+    });
+    
+    // ============================================================
+    // 6. AOS INIT (Animasi scroll)
+    // ============================================================
+    AOS.init({ once: true, duration: 800 });
+    
+    // ============================================================
+    // 7. COUNTDOWN TIMER
+    // ============================================================
+    function updateCountdown() {
+        const target = new Date('September 13, 2026 07:30:00').getTime();
+        const now = new Date().getTime();
+        const d = target - now;
+        if (d < 0) {
+            document.getElementById('days').innerText = '00';
+            document.getElementById('hours').innerText = '00';
+            document.getElementById('minutes').innerText = '00';
+            document.getElementById('seconds').innerText = '00';
+            return;
+        }
+        const days = Math.floor(d / (1000*60*60*24));
+        const hours = Math.floor((d % (86400000))/3600000);
+        const mins = Math.floor((d % 3600000)/60000);
+        const secs = Math.floor((d % 60000)/1000);
+        document.getElementById('days').innerText = days < 10 ? '0'+days : days;
+        document.getElementById('hours').innerText = hours < 10 ? '0'+hours : hours;
+        document.getElementById('minutes').innerText = mins < 10 ? '0'+mins : mins;
+        document.getElementById('seconds').innerText = secs < 10 ? '0'+secs : secs;
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
 
-   const FORM_ID = '1FAIpQLSc7bXSOTJbSn0KAu2UTrmfo5dSXKaME8HejZGRCh80jl9eVjw'; // GANTI DENGAN FORM ID ANDA
-    // Entry IDs (ganti dengan milik Anda)
-    const ENTRY_NAMA = 'entry.1836133497';        // Ganti dengan entry ID untuk field NAMA
-    const ENTRY_KEHADIRAN = 'entry.1046409688';   // Ganti dengan entry ID untuk field KEHADIRAN  
-    const ENTRY_JUMLAH = 'entry.853313957';      // Ganti dengan entry ID untuk field JUMLAH TAMU
-    const ENTRY_UCAPAN = 'entry.392144659';      // Ganti dengan entry ID untuk field UCAPAN
-    
-    // URL Google Form (jangan diubah)
-    const GOOGLE_FORM_URL = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`;
-    
     // ============================================================
-    // Kode JavaScript (tidak perlu diubah)
+    // 9. FLOATING ELEMENTS
     // ============================================================
-     
-    const form = document.getElementById('rsvpForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const messageDiv = document.getElementById('message');
-    const radioYa = document.getElementById('hadir_ya');
-    const radioTidak = document.getElementById('hadir_tidak');
-    const jumlahTamuGroup = document.getElementById('jumlahTamuGroup');
-    const jumlahTamuInput = document.getElementById('jumlah_tamu');
-    
-    // Tampilkan/sembunyikan field jumlah tamu berdasarkan pilihan kehadiran
-    radioYa.addEventListener('change', function() {
-      if (this.checked) {
-        jumlahTamuGroup.style.display = 'block';
-      }
-    });
-    
-    radioTidak.addEventListener('change', function() {
-      if (this.checked) {
-        jumlahTamuGroup.style.display = 'none';
-        jumlahTamuInput.value = '';
-      }
-    });
-    
-    function showMessage(text, type) {
-      messageDiv.textContent = text;
-      messageDiv.className = `message ${type}`;
-      setTimeout(() => {
-        messageDiv.style.display = 'none';
-        messageDiv.className = 'message';
-      }, 5000);
-    }
-    
-    // Fungsi untuk mengirim data ke Google Form
-    // Menggunakan URLSearchParams untuk membuat request params yang benar
-    async function submitToGoogleForm(formElement) {
-      // Buat FormData dari element form (cara paling akurat)
-      const formData = new FormData(formElement);
-      
-      // Konversi ke URLSearchParams untuk encoding yang benar
-      const urlParams = new URLSearchParams();
-      
-      // Iterasi semua field form dan tambahkan ke URLSearchParams
-      for (let [key, value] of formData.entries()) {
-        if (value && value.trim() !== '') {
-          urlParams.append(key, value);
+    setInterval(() => {
+        // Cek apakah splash screen sudah tertutup
+        if (splashScreen && splashScreen.classList.contains('hide')) {
+            let el = document.createElement('div');
+            el.classList.add('floating-petal');
+            el.innerHTML = ['☁️', '💙', '✨', '🕊️', '🌸'][Math.floor(Math.random()*5)];
+            el.style.left = Math.random() * 100 + '%';
+            el.style.fontSize = (Math.random() * 22 + 16) + 'px';
+            el.style.animationDuration = (Math.random() * 10 + 7) + 's';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 14000);
         }
-      }
-      
-      // Debug: lihat params yang akan dikirim
-      console.log('Mengirim data dengan params:');
-      for (let [key, value] of urlParams.entries()) {
-        console.log(`${key}: ${value}`);
-      }
-      
-      // Kirim POST request ke Google Forms
-      const response = await fetch(GOOGLE_FORM_URL, {
-        method: 'POST',
-        // mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: urlParams.toString()
-      });
-      
-      return response;
-    }
-    
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      // Validasi sederhana
-      const nama = document.getElementById('nama').value.trim();
-      const kehadiran = document.querySelector('input[name="entry.1046409688"]:checked');
-      
-      if (!nama) {
-        showMessage('❌ Mohon isi nama lengkap Anda', 'error');
-        return;
-      }
-      
-      if (!kehadiran) {
-        showMessage('❌ Mohon pilih apakah Anda akan hadir (YA/TIDAK)', 'error');
-        return;
-      }
-      
-      // Validasi jumlah tamu jika hadir = Ya
-      if (kehadiran.value === 'Ya') {
-        const jumlahTamu = document.getElementById('jumlah_tamu').value;
-        if (jumlahTamu && (parseInt(jumlahTamu) < 1 || parseInt(jumlahTamu) > 10)) {
-          showMessage('❌ Jumlah tamu harus antara 1-10 orang', 'error');
-          return;
-        }
-      }
-      
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span class="loading"></span> Mengirim...';
-      
-      try {
-        // Kirim seluruh form (tidak perlu manual append satu per satu)
-        await submitToGoogleForm(form);
-        
-        showMessage(`✅ Terima kasih ${nama}! Konfirmasi kehadiran Anda telah tercatat.`, 'success');
-        
-        // Reset form setelah sukses
-        form.reset();
-        jumlahTamuGroup.style.display = 'none';
-        
-      } catch (error) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Kirim Konfirmasi Kehadiran';
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Kirim Konfirmasi Kehadiran';
-      }
-    });
-   
+    }, 2000);
+
     // show form
      const CSV_URL = 'https://docs.google.com/spreadsheets/d/1FTUfyf_K4PIwIdV6RQ7-bP8OURLWQNZ146Cux1SfyAg/edit?usp=sharing';
       const SPREADSHEET_ID = '1FTUfyf_K4PIwIdV6RQ7-bP8OURLWQNZ146Cux1SfyAg';  // GANTI INI
@@ -1419,21 +1415,142 @@
             if (document.hidden) return;
             renderFullPage();
         }, 30000);
-
-    // HEART PARTICLES
-    // ============================================================
-    document.body.addEventListener('click', (e) => {
-        const heart = document.createElement('div');
-        heart.className = 'heart-particle';
-        heart.innerHTML = ['❤️', '💙', '💜', '💖', '💗'][Math.floor(Math.random() * 5)];
-        heart.style.left = e.clientX - 10 + 'px';
-        heart.style.top = e.clientY - 10 + 'px';
-        document.body.appendChild(heart);
-        setTimeout(() => heart.remove(), 1000);
-    });
+        
         // Start
         renderFullPage();
+
+         setInterval(()=>{ let d=document.createElement('div'); d.classList.add('floating-petal'); d.innerHTML='☁️✨'; d.style.position='fixed'; d.style.left=Math.random()*100+'%'; d.style.top='-20px'; d.style.fontSize=(Math.random()*20+14)+'px'; d.style.opacity=0.5; d.style.animation='floatClouds 10s linear forwards'; d.style.pointerEvents='none'; document.body.appendChild(d); setTimeout(()=>d.remove(),10000); },2500);
+  const style=document.createElement('style'); style.textContent=`@keyframes floatClouds{ 0%{transform:translateY(0) rotate(0deg); opacity:0;} 10%{opacity:0.6;} 90%{opacity:0.3;} 100%{transform:translateY(100vh) rotate(360deg); opacity:0;}} .floating-petal{ position:fixed; z-index:999; }`; document.head.appendChild(style);
+// https://docs.google.com/forms/d/e/1FAIpQLSc7bXSOTJbSn0KAu2UTrmfo5dSXKaME8HejZGRCh80jl9eVjw/viewform?usp=pp_url&
+// entry.1836133497=test&entry.1046409688=Ya&entry.853313957=1&entry.392144659=test%0A
+
+   const FORM_ID = '1FAIpQLSc7bXSOTJbSn0KAu2UTrmfo5dSXKaME8HejZGRCh80jl9eVjw'; // GANTI DENGAN FORM ID ANDA
+    // Entry IDs (ganti dengan milik Anda)
+    const ENTRY_NAMA = 'entry.1836133497';        // Ganti dengan entry ID untuk field NAMA
+    const ENTRY_KEHADIRAN = 'entry.1046409688';   // Ganti dengan entry ID untuk field KEHADIRAN  
+    const ENTRY_JUMLAH = 'entry.853313957';      // Ganti dengan entry ID untuk field JUMLAH TAMU
+    const ENTRY_UCAPAN = 'entry.392144659';      // Ganti dengan entry ID untuk field UCAPAN
+    
+    // URL Google Form (jangan diubah)
+    const GOOGLE_FORM_URL = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`;
+    
+    // ============================================================
+    // Kode JavaScript (tidak perlu diubah)
+    // ============================================================
+     
+    const form = document.getElementById('rsvpForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const messageDiv = document.getElementById('message');
+    const radioYa = document.getElementById('hadir_ya');
+    const radioTidak = document.getElementById('hadir_tidak');
+    const jumlahTamuGroup = document.getElementById('jumlahTamuGroup');
+    const jumlahTamuInput = document.getElementById('jumlah_tamu');
+    
+    // Tampilkan/sembunyikan field jumlah tamu berdasarkan pilihan kehadiran
+    radioYa.addEventListener('change', function() {
+      if (this.checked) {
+        jumlahTamuGroup.style.display = 'block';
+      }
+    });
+    
+    radioTidak.addEventListener('change', function() {
+      if (this.checked) {
+        jumlahTamuGroup.style.display = 'none';
+        jumlahTamuInput.value = '';
+      }
+    });
+    
+    function showMessage(text, type) {
+      messageDiv.textContent = text;
+      messageDiv.className = `message ${type}`;
+      setTimeout(() => {
+        messageDiv.style.display = 'none';
+        messageDiv.className = 'message';
+      }, 5000);
+    }
+    
+    // Fungsi untuk mengirim data ke Google Form
+    // Menggunakan URLSearchParams untuk membuat request params yang benar
+    async function submitToGoogleForm(formElement) {
+      // Buat FormData dari element form (cara paling akurat)
+      const formData = new FormData(formElement);
+      
+      // Konversi ke URLSearchParams untuk encoding yang benar
+      const urlParams = new URLSearchParams();
+      
+      // Iterasi semua field form dan tambahkan ke URLSearchParams
+      for (let [key, value] of formData.entries()) {
+        if (value && value.trim() !== '') {
+          urlParams.append(key, value);
+        }
+      }
+      
+      // Debug: lihat params yang akan dikirim
+      console.log('Mengirim data dengan params:');
+      for (let [key, value] of urlParams.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+      
+      // Kirim POST request ke Google Forms
+      const response = await fetch(GOOGLE_FORM_URL, {
+        method: 'POST',
+        // mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: urlParams.toString()
+      });
+      
+      return response;
+    }
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Validasi sederhana
+      const nama = document.getElementById('nama').value.trim();
+      const kehadiran = document.querySelector('input[name="entry.1046409688"]:checked');
+      
+      if (!nama) {
+        showMessage('❌ Mohon isi nama lengkap Anda', 'error');
+        return;
+      }
+      
+      if (!kehadiran) {
+        showMessage('❌ Mohon pilih apakah Anda akan hadir (YA/TIDAK)', 'error');
+        return;
+      }
+      
+      // Validasi jumlah tamu jika hadir = Ya
+      if (kehadiran.value === 'Ya') {
+        const jumlahTamu = document.getElementById('jumlah_tamu').value;
+        if (jumlahTamu && (parseInt(jumlahTamu) < 1 || parseInt(jumlahTamu) > 10)) {
+          showMessage('❌ Jumlah tamu harus antara 1-10 orang', 'error');
+          return;
+        }
+      }
+      
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="loading"></span> Mengirim...';
+      
+      try {
+        // Kirim seluruh form (tidak perlu manual append satu per satu)
+        await submitToGoogleForm(form);
         
+        showMessage(`✅ Terima kasih ${nama}! Konfirmasi kehadiran Anda telah tercatat.`, 'success');
+        
+        // Reset form setelah sukses
+        form.reset();
+        jumlahTamuGroup.style.display = 'none';
+        
+      } catch (error) {
+        console.error('Error detail:', error);
+        showMessage('❌ Maaf, terjadi kesalahan. Silakan coba lagi.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Kirim Konfirmasi Kehadiran';
+      }
+    });
    
 </script>
 </body>
