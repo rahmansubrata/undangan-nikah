@@ -512,6 +512,19 @@
             .timeline-item { flex-direction: column; text-align: center; }
             .autoplay-hint { font-size: 11px; padding: 8px 15px; bottom: 90px; }
         }
+         /* Heart Particles on Click */
+        .heart-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 1.2rem;
+            animation: floatHeart 1s ease-out forwards;
+        }
+        @keyframes floatHeart {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
+        }
+
   </style>
 </head>
 <body>
