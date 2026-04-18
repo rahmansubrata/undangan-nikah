@@ -524,7 +524,46 @@
             0% { transform: translateY(0) scale(1); opacity: 1; }
             100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
         }
-
+       
+        /* Google Maps Container */
+        .map-container {
+            width: 100%;
+            margin: 30px 0;
+            clear: both;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        #google-map {
+            width: 100%;
+            height: 350px;
+            border: none;
+        }
+        .map-button {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .btn-navigate {
+            background: linear-gradient(135deg, #4285F4, #34A853);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            text-decoration: none;
+        }
+        .btn-navigate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(66,133,244,0.3);
+        }
+        
   </style>
 </head>
 <body>
@@ -633,8 +672,26 @@
         <div class="card" style="background:white; border-radius:40px; padding:25px; flex:1; min-width:240px"><i class="fas fa-mosque" style="font-size:2rem; color:#5f9dc9;"></i><h3>Akad Nikah</h3><p>Sabtu, 13 September 2026<br>07.30 - 09.00 WIB</p><p>Link. Karapyak<br>Jl. Angkrek Situ, kel. Situ, Sumedang Utara, Sumedang</p></div>
         <div class="card" style="background:white; border-radius:40px; padding:25px; flex:1; min-width:240px"><i class="fas fa-glass-cheers" style="font-size:2rem; color:#5f9dc9;"></i><h3>Resepsi</h3><p>Sabtu, 13 September 2026<br>10.00 - 13.00 WIB</p>Link. Karapyak<br>Jl. Angkrek Situ, kel. Situ, Sumedang Utara, Sumedang</p></div>
       </div>
-      <div id="map"></div>
-      <p style="text-align:center; margin-top:15px"><i class="fas fa-map-marker-alt"></i> Klik peta untuk navigasi</p>
+      <!-- <div id="map"></div>
+      <p style="text-align:center; margin-top:15px"><i class="fas fa-map-marker-alt"></i> Klik peta untuk navigasi</p> -->
+       <div class="map-container">
+                <iframe 
+                    id="google-map"
+                    src="https://maps.google.com/maps?q=Pendopo+Uti,+Jatiasih,+Bekasi&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                    frameborder="0"
+                    allowfullscreen>
+                </iframe>
+                <div class="map-button">
+                    <a href="https://maps.google.com/maps?q=Pendopo+Uti,+Jatiasih,+Bekasi" 
+                       target="_blank" 
+                       class="btn-navigate">
+                        <i class="fas fa-location-dot"></i> Buka Navigasi Google Maps
+                    </a>
+                </div>
+                <p style="text-align:center; margin-top:15px; font-size:13px; color:#666;">
+                    <i class="fas fa-map-marker-alt"></i> Pendopo Uti, Jl. Tim. Asih, RT.007/RW.008, Jatiasih, Kota Bekasi
+                </p>
+            </div>
     </div>
   </section>
 
