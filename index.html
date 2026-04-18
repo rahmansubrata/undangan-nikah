@@ -500,15 +500,35 @@
   <p>Bismillahirrahmanirrahim</p>
 </div>
 
-<audio id="bgMusic" loop>
-   <!-- <source src="Stephen-song.mp3" type="audio/mpeg"> -->
+<!-- <audio id="bgMusic" loop>
+   <source src="Stephen-song.mp3" type="audio/mpeg">
   <source src="Blue.mp3" type="audio/mpeg">
-  <!-- <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg"> -->
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
 </audio>
 <div class="music-player">
   <div class="equalizer"><span></span><span></span><span></span><span></span></div>
   <button class="music-toggle" id="musicToggleBtn"><i class="fas fa-volume-up"></i></button>
+</div> -->
+  <!-- MUSIK BACKGROUND dari REPO: assets/music/Stephen-song.mp3 -->
+<audio id="bgMusic" loop preload="auto">
+    <!-- <source src="assets/music/Stephen-song.mp3" type="audio/mpeg"> -->
+    <source src="Blue.mp3" type="audio/mpeg">
+</audio>
+
+<div class="music-player" id="musicPlayer">
+    <div class="equalizer" id="equalizerVis">
+        <span></span><span></span><span></span><span></span>
+    </div>
+    <button class="music-toggle" id="musicToggleBtn">
+        <i class="fas fa-volume-mute"></i>
+    </button>
 </div>
+
+<!-- Hint untuk pengguna bahwa musik akan dimulai -->
+<div class="autoplay-hint" id="autoplayHint">
+    🎵 Klik di mana saja untuk memutar musik
+</div>
+
 
 <main id="mainContent" style="opacity:0; transition:0.5s">
   <!-- Hero Section -->
@@ -596,13 +616,18 @@
   </section> -->
 
   <!-- Our Song (spesial) -->
-  <section>
-    <div class="container our-song" style="background:linear-gradient(120deg,#e4f0fe,#d4e9fc); border-radius:60px; padding:40px 25px; text-align:center">
-      <h2 class="script">🎵 Our Song 🎵</h2>
-      <p><strong>Instrumental Piano - "A Thousand Years"</strong></p>
-      <button class="btn-sky" id="playSongBtn"><i class="fas fa-play"></i> Putar Lagu Spesial</button>
-    </div>
-  </section>
+   <section id="oursong">
+        <div class="container our-song fade-up">
+            <h2 class="script" style="font-size:2.2rem;">🎵 Our Song 🎵</h2>
+            <p>"Stephen - Lagu spesial untuk momen terindah kami"</p>
+            <div style="display: flex; justify-content: center; gap: 8px; margin: 20px 0;">
+                <div class="song-bar"></div><div class="song-bar"></div><div class="song-bar"></div><div class="song-bar"></div><div class="song-bar"></div>
+            </div>
+            <button class="btn-sky" id="playSpecialSongBtn">
+                <i class="fas fa-play"></i> Putar Lagu Spesial
+            </button>
+        </div>
+    </section>
 
   <!-- RSVP & Gift -->
   <section>
