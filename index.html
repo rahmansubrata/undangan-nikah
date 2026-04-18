@@ -578,7 +578,7 @@
       </div>
       <div class="parents-info fade-up">
         <h3 class="script" style="font-size:2rem">Annastasya Ria Dewi</h3>
-        <p>Putri kedua dari (alm) Bapak  & Ibu Eulis Hayati</p>
+        <p>Putri kedua dari (alm) Bapak Asep Ria Setiawan & Ibu Eulis Hayati</p>
         <div style="height:1px; background:#cfe9ff; width:50px; margin:20px auto"></div>
         <h3 class="script" style="font-size:2rem">Rahman Subrata</h3>
         <p>Putra kedua dari Bapak Tata & Ibu Nining Suharningsih</p>
@@ -1345,9 +1345,21 @@
             if (document.hidden) return;
             renderFullPage();
         }, 30000);
-        
+
+    // HEART PARTICLES
+    // ============================================================
+    document.body.addEventListener('click', (e) => {
+        const heart = document.createElement('div');
+        heart.className = 'heart-particle';
+        heart.innerHTML = ['❤️', '💙', '💜', '💖', '💗'][Math.floor(Math.random() * 5)];
+        heart.style.left = e.clientX - 10 + 'px';
+        heart.style.top = e.clientY - 10 + 'px';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
+    });
         // Start
         renderFullPage();
+        
    
 </script>
 </body>
