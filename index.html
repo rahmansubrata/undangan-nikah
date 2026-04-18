@@ -491,6 +491,27 @@
         .error { background: #f8d7da; color: #721c24; }
         .last-update { text-align: center; margin-top: 30px; color: rgba(255,255,255,0.7); font-size: 0.8rem; }
         @media (max-width: 768px) { .card-grid { grid-template-columns: 1fr; } }
+
+        /* Music Error Message */
+        .music-error {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ff6b6b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 12px;
+            z-index: 1001;
+            display: none;
+        }
+        
+        @media (max-width: 650px) {
+            .hero .script-name { font-size: 2.5rem; }
+            .time-box { width: 65px; }
+            .timeline-item { flex-direction: column; text-align: center; }
+            .autoplay-hint { font-size: 11px; padding: 8px 15px; bottom: 90px; }
+        }
   </style>
 </head>
 <body>
@@ -509,25 +530,27 @@
   <div class="equalizer"><span></span><span></span><span></span><span></span></div>
   <button class="music-toggle" id="musicToggleBtn"><i class="fas fa-volume-up"></i></button>
 </div> -->
-  <!-- MUSIK BACKGROUND dari REPO: assets/music/Stephen-song.mp3 -->
+ <!-- MUSIK BACKGROUND -->
 <audio id="bgMusic" loop preload="auto">
-    <!-- <source src="assets/music/Stephen-song.mp3" type="audio/mpeg"> -->
     <source src="Blue.mp3" type="audio/mpeg">
 </audio>
 
+<!-- Music Player Widget -->
 <div class="music-player" id="musicPlayer">
     <div class="equalizer" id="equalizerVis">
         <span></span><span></span><span></span><span></span>
     </div>
     <button class="music-toggle" id="musicToggleBtn">
-        <i class="fas fa-volume-mute"></i>
+        <i class="fas fa-volume-up"></i>
     </button>
 </div>
 
-<!-- Hint untuk pengguna bahwa musik akan dimulai -->
+<!-- Hint untuk memulai musik -->
 <div class="autoplay-hint" id="autoplayHint">
-    🎵 Klik di mana saja untuk memutar musik
+    <i class="fas fa-music"></i> Klik di sini untuk memutar musik
 </div>
+
+<div id="musicErrorMsg" class="music-error"></div>
 
 
 <main id="mainContent" style="opacity:0; transition:0.5s">
@@ -734,15 +757,27 @@
   })();
 
   // Musik
- // ============================================================
+   // ============================================================
     // 2. AUTOPLAY MUSIK (AKTIF SETELAH INTERAKSI)
     // ============================================================
-    const bgAudio = document.getElementById('bgMusic');
+     const bgAudio = document.getElementById('bgMusic');
     const toggleBtn = document.getElementById('musicToggleBtn');
     const eqSpans = document.querySelectorAll('#equalizerVis span');
     const autoplayHint = document.getElementById('autoplayHint');
+    const musicErrorMsg = document.getElementById('musicErrorMsg');
+    
     let musicPlaying = false;
     let musicStarted = false;
+    let retryCount = 0;
+    const MAX_RETRY = 3;
+    
+    function showErrorMsg(text) {
+        musicErrorMsg.textContent = text;
+        musicErrorMsg.style.display = 'block';
+        setTimeout(() => {
+            musicErrorMsg.style.display = 'none';
+        }, 5000);
+    }
     
     function animateEqualizer(active) {
         eqSpans.forEach(span => span.style.animationPlayState = active ? 'running' : 'paused');
@@ -757,20 +792,121 @@
             toggleBtn.innerHTML = '<i class="fas fa-music"></i>';
             animateEqualizer(true);
             
-            // Sembunyikan hint setelah musik dimulai
+            // Sembunyikan hint
             if (autoplayHint) {
                 autoplayHint.style.opacity = '0';
-                setTimeout(() => autoplayHint.style.display = 'none', 1000);
+                autoplayHint.style.visibility = 'hidden';
             }
-        }).catch(e => {
-            console.log("Autoplay masih perlu interaksi:", e);
-            // Tampilkan hint lebih jelas
-            if (autoplayHint) {
-                autoplayHint.innerHTML = '🎵 Klik tombol musik di kanan bawah untuk memutar lagu 🎵';
-                autoplayHint.style.background = '#667eea';
+            retryCount = 0;
+        }).catch((error) => {
+            console.error("Gagal memutar musik:", error);
+            
+            if (error.name === 'NotAllowedError') {
+                // Browser mencegah autoplay, hint sudah ditampilkan
+                console.log("Autoplay diblokir browser, menunggu interaksi user");
+            } else if (error.name === 'NotSupportedError') {
+                showErrorMsg("❌ Format file MP3 tidak didukung browser Anda");
+            } else {
+                // Coba retry dengan file alternatif (SoundHelix)
+                if (retryCount < MAX_RETRY) {
+                    retryCount++;
+                    console.log(`Retry ${retryCount}/${MAX_RETRY} dengan URL alternatif...`);
+                    bgAudio.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3';
+                    bgAudio.load();
+                    setTimeout(() => {
+                        if (!musicStarted) startBackgroundMusic();
+                    }, 500);
+                } else {
+                    showErrorMsg("⚠️ Gagal memutar musik. Periksa koneksi internet Anda.");
+                }
             }
         });
     }
+    
+    // Tombol musik manual
+    toggleBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (musicPlaying) {
+            bgAudio.pause();
+            musicPlaying = false;
+            toggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+            animateEqualizer(false);
+        } else {
+            bgAudio.play().then(() => {
+                musicPlaying = true;
+                musicStarted = true;
+                toggleBtn.innerHTML = '<i class="fas fa-music"></i>';
+                animateEqualizer(true);
+                if (autoplayHint) autoplayHint.style.display = 'none';
+            }).catch((err) => {
+                console.error("Manual play error:", err);
+                showErrorMsg("❌ Gagal memutar musik. Coba refresh halaman.");
+            });
+        }
+    };
+    
+    // Klik hint untuk memulai musik
+    if (autoplayHint) {
+        autoplayHint.onclick = (e) => {
+            e.stopPropagation();
+            startBackgroundMusic();
+        };
+    }
+    
+    // Autoplay setelah berbagai interaksi
+    const eventsForAutoplay = ['click', 'touchstart', 'scroll'];
+    eventsForAutoplay.forEach(eventName => {
+        window.addEventListener(eventName, startBackgroundMusic, { once: true });
+    });
+    
+    // Cek apakah file MP3 tersedia (preload check)
+    bgAudio.addEventListener('error', (e) => {
+        console.error("Audio element error:", e);
+        if (bgAudio.error) {
+            switch(bgAudio.error.code) {
+                case 4:
+                    showErrorMsg("❌ File MP3 tidak ditemukan. Pastikan assets/music/Stephen-song.mp3 sudah diupload.");
+                    break;
+                default:
+                    showErrorMsg("⚠️ Gagal memuat file musik. Coba refresh halaman.");
+            }
+        }
+    });
+    
+    // ============================================================
+    // 3. OUR SONG SPESIAL
+    // ============================================================
+    const specialSongBtn = document.getElementById('playSpecialSongBtn');
+    let specialAudio = null;
+    let isSpecialPlaying = false;
+    
+    specialSongBtn.onclick = () => {
+        if (isSpecialPlaying && specialAudio) {
+            specialAudio.pause();
+            isSpecialPlaying = false;
+            specialSongBtn.innerHTML = '<i class="fas fa-play"></i> Putar Lagu Spesial';
+        } else {
+            if (specialAudio) {
+                specialAudio.pause();
+            }
+            specialAudio = new Audio('assets/music/Stephen-song.mp3');
+            specialAudio.play().catch(e => {
+                console.error("Special song error:", e);
+                specialSongBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal, coba lagi';
+                setTimeout(() => {
+                    specialSongBtn.innerHTML = '<i class="fas fa-play"></i> Putar Lagu Spesial';
+                }, 2000);
+            });
+            isSpecialPlaying = true;
+            specialSongBtn.innerHTML = '<i class="fas fa-heart"></i> Sedang Diputar';
+            
+            specialAudio.onended = () => {
+                isSpecialPlaying = false;
+                specialSongBtn.innerHTML = '<i class="fas fa-play"></i> Putar Lagu Spesial';
+                specialAudio = null;
+            };
+        }
+    };
   
   // Countdown ke 12 April 2026
   function updateCountdown(){
