@@ -513,7 +513,7 @@
   <!-- Hero Section -->
   <section class="hero">
     <div class="container hero-content fade-up">
-      <p class="" style="font-size:1.4rem;">The Wedding of</p>
+      <p class="p-script" style="font-size:1.4rem;">The Wedding of</p>
       <h1 class="script script-name">Annastasya & Rahman</h1>
       <p class="date" style="margin:15px 0">Ahad, 13 September 2026</p>
       <div class="countdown" id="countdownTimer">
@@ -696,7 +696,7 @@
   (function() {
     const urlParams = new URLSearchParams(window.location.search);
     const dearName = urlParams.get('dear') || 'Keluarga & Sahabat';
-    const hero = document.querySelector('.hero-content p.script');
+    const hero = document.querySelector('.hero-content p.p-script');
     if(hero) hero.innerHTML = `Kepada Yth. ${dearName}`;
     
     const loading = document.getElementById('loadingScreen');
