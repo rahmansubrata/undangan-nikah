@@ -1467,9 +1467,9 @@
     
     radioTidak.addEventListener('change', function() {
       if (this.checked) {
-        jumlahTamuGroup.style.display = 'none';
-        jumlahTamuInput.required = false; // Wajib isi jika HADIR
-        jumlahTamuInput.value = '1'; // Set default 0 saat pilih TIDAK
+        jumlahTamuGroup.style.display = 'block';
+        // jumlahTamuInput.required = false; // Wajib isi jika HADIR
+        // jumlahTamuInput.value = '1'; // Set default 0 saat pilih TIDAK
       }
     });
     
@@ -1543,7 +1543,7 @@
       if (kehadiran.value === 'Ya') {
         const jumlahTamu = document.getElementById('jumlah_tamu').value;
         if (jumlahTamu && (parseInt(jumlahTamu) < 1 || parseInt(jumlahTamu) > 2)) {
-          showMessage('❌ Jumlah tamu harus antara 1-10 orang', 'error');
+          showMessage('❌ Jumlah tamu harus antara 1-2 orang', 'error');
           return;
         }
       }
