@@ -1489,11 +1489,11 @@
       
       // Konversi ke URLSearchParams untuk encoding yang benar
       const urlParams = new URLSearchParams();
-      const kehadiranInput = formElement.querySelector('input[type="radio"]:checked');
-      if (kehadiranInput && kehadiranInput.value === 'Tidak') {
-        // Sesuaikan name entry dengan ID entry jumlah tamu di HTML Anda (contoh: entry.15121)
-        formData.set('entry.853313957', '0'); 
-      }
+      // const kehadiranInput = formElement.querySelector('input[type="radio"]:checked');
+      // if (kehadiranInput && kehadiranInput.value === 'Tidak') {
+      //   // Sesuaikan name entry dengan ID entry jumlah tamu di HTML Anda (contoh: entry.15121)
+      //   formData.set('entry.853313957', '0'); 
+      // }
       
       // Iterasi semua field form dan tambahkan ke URLSearchParams
       for (let [key, value] of formData.entries()) {
