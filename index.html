@@ -1468,6 +1468,7 @@
     radioTidak.addEventListener('change', function() {
       if (this.checked) {
         jumlahTamuGroup.style.display = 'none';
+        jumlahTamuInput.required = false; // Wajib isi jika HADIR
         jumlahTamuInput.value = '0'; // Set default 0 saat pilih TIDAK
       }
     });
