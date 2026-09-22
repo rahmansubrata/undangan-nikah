@@ -905,7 +905,7 @@
                     
                     <div class="form-group" id="jumlahTamuGroup" style="display: none;">
                         <label>Jumlah Tamu yang Dibawa</label>
-                        <input type="number" id="jumlah_tamu" name="entry.853313957" min="1" max="10" placeholder="Maksimal 10 orang">
+                        <input type="number" id="jumlah_tamu" name="entry.853313957" min="1" max="5" placeholder="Maksimal 5 orang">
                         <div class="note">Kosongkan jika tidak membawa tamu</div>
                     </div>
                     
@@ -1468,7 +1468,7 @@
     radioTidak.addEventListener('change', function() {
       if (this.checked) {
         jumlahTamuGroup.style.display = 'none';
-        jumlahTamuInput.value = '';
+        jumlahTamuInput.value = '0'; // Set default 0 saat pilih TIDAK
       }
     });
     
@@ -1489,6 +1489,11 @@
       
       // Konversi ke URLSearchParams untuk encoding yang benar
       const urlParams = new URLSearchParams();
+      const kehadiranInput = formElement.querySelector('input[type="radio"]:checked');
+      if (kehadiranInput && kehadiranInput.value === 'Tidak') {
+        // Sesuaikan name entry dengan ID entry jumlah tamu di HTML Anda (contoh: entry.15121)
+        formData.set('entry.853313957', '0'); 
+      }
       
       // Iterasi semua field form dan tambahkan ke URLSearchParams
       for (let [key, value] of formData.entries()) {
@@ -1536,7 +1541,7 @@
       // Validasi jumlah tamu jika hadir = Ya
       if (kehadiran.value === 'Ya') {
         const jumlahTamu = document.getElementById('jumlah_tamu').value;
-        if (jumlahTamu && (parseInt(jumlahTamu) < 1 || parseInt(jumlahTamu) > 10)) {
+        if (jumlahTamu && (parseInt(jumlahTamu) < 1 || parseInt(jumlahTamu) > 2)) {
           showMessage('❌ Jumlah tamu harus antara 1-10 orang', 'error');
           return;
         }
